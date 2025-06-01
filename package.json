@@ -1,0 +1,60 @@
+{
+  "name": "cohang",
+  "version": "1.0.0",
+  "description": "App dạy thêm quản lý dạy thêm ở nhà",
+  "main": "public/electron.js",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "electron": "electron .",
+    "electron-dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build-electron": "npm run build && electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "electron",
+    "react",
+    "sqlite",
+    "education"
+  ],
+  "author": "",
+  "license": "ISC",
+  "build": {
+    "appId": "com.cohang.app",
+    "productName": "CoHang Education Management",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "public/**/*",
+      "dist/**/*",
+      "node_modules/**/*"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "electron": "^36.3.2",
+    "electron-builder": "^26.0.12",
+    "html-webpack-plugin": "^5.6.3",
+    "style-loader": "^4.0.0",
+    "wait-on": "^8.0.3",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
+  },
+  "dependencies": {
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "better-sqlite3": "^11.10.0",
+    "concurrently": "^9.1.2",
+    "electron-serve": "^2.1.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.1",
+    "sqlite3": "^5.1.7"
+  }
+}

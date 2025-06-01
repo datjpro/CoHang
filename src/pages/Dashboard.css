@@ -1,0 +1,182 @@
+.dashboard {
+  padding: 0;
+}
+
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.dashboard-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 8px;
+}
+
+.dashboard-subtitle {
+  font-size: 16px;
+  color: #718096;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-card-blue {
+  border-left-color: #3182ce;
+}
+
+.stat-card-green {
+  border-left-color: #38a169;
+}
+
+.stat-card-purple {
+  border-left-color: #805ad5;
+}
+
+.stat-card-orange {
+  border-left-color: #ed8936;
+}
+
+.stat-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-card-info {
+  flex: 1;
+}
+
+.stat-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #718096;
+  margin-bottom: 8px;
+}
+
+.stat-card-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.stat-card-icon {
+  font-size: 36px;
+  opacity: 0.8;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.dashboard-section {
+  /* Additional section styling if needed */
+}
+
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  border-left: 3px solid #e2e8f0;
+}
+
+.activity-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-message {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3748;
+  margin-bottom: 4px;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: #718096;
+}
+
+.quick-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quick-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f7fafc;
+  border-radius: 8px;
+}
+
+.quick-stat-label {
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.quick-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card-value {
+    font-size: 24px;
+  }
+
+  .stat-card-icon {
+    font-size: 28px;
+  }
+}
