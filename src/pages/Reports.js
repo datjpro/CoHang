@@ -1,6 +1,6 @@
 import React from "react";
 
-function Reports({ dbManager }) {
+function Reports() {
   return (
     <div className="reports-page">
       <div className="page-header">

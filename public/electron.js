@@ -1,5 +1,10 @@
 const { app, BrowserWindow, Menu, dialog } = require("electron");
 const path = require("path");
+const {
+  initDatabase,
+  setupDatabaseIPC,
+  closeDatabaseConnection,
+} = require("./databaseIPC");
 const isDev = process.env.NODE_ENV !== "production";
 
 let mainWindow;
@@ -9,9 +14,10 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      preload: path.join(__dirname, "preload.js"),
     },
     icon: path.join(__dirname, "icon.png"), // Thêm icon sau
     show: false,
@@ -88,7 +94,11 @@ function createMenu() {
   Menu.setApplicationMenu(menu);
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  initDatabase();
+  setupDatabaseIPC();
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

@@ -1,6 +1,6 @@
 import React from "react";
 
-function Schedule({ dbManager }) {
+function Schedule() {
   return (
     <div className="schedule-page">
       <div className="page-header">

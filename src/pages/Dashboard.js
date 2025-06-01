@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard.css";
 
-function Dashboard({ dbManager }) {
+function Dashboard() {
   const [stats, setStats] = useState({
     totalTeachers: 0,
     totalStudents: 0,
@@ -9,52 +9,70 @@ function Dashboard({ dbManager }) {
     totalRevenue: 0,
   });
   const [recentActivities, setRecentActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (dbManager) {
-      loadDashboardData();
-    }
-  }, [dbManager]);
+    loadDashboardData();
+  }, []);
 
-  const loadDashboardData = () => {
+  const loadDashboardData = async () => {
     try {
-      const teachers = dbManager.getAllTeachers();
-      const students = dbManager.getAllStudents();
-      const courses = dbManager.getAllCourses();
+      setLoading(true);
+      if (window.electronAPI) {
+        const [teachers, students, courses] = await Promise.all([
+          window.electronAPI.getAllTeachers(),
+          window.electronAPI.getAllStudents(),
+          window.electronAPI.getAllCourses(),
+        ]);
+        setStats({
+          totalTeachers: teachers.length,
+          totalStudents: students.length,
+          totalCourses: courses.length,
+          totalRevenue: 0, // Will calculate from payments later
+        });
 
-      setStats({
-        totalTeachers: teachers.length,
-        totalStudents: students.length,
-        totalCourses: courses.length,
-        totalRevenue: 0, // Will calculate from payments later
-      });
-
-      // Mock recent activities for now
-      setRecentActivities([
-        {
-          id: 1,
-          type: "student_registration",
-          message: "Học sinh mới đăng ký khóa học Toán lớp 12",
-          time: "2 giờ trước",
-          icon: "👨‍🎓",
-        },
-        {
-          id: 2,
-          type: "payment",
-          message: "Thanh toán học phí khóa học Vật lý",
-          time: "4 giờ trước",
-          icon: "💰",
-        },
-        {
-          id: 3,
-          type: "schedule",
-          message: "Lịch học mới được tạo cho tuần này",
-          time: "1 ngày trước",
-          icon: "📅",
-        },
-      ]);
+        // Mock recent activities for now
+        setRecentActivities([
+          {
+            id: 1,
+            type: "student_registration",
+            message: "Học sinh mới đăng ký khóa học Toán lớp 12",
+            time: "2 giờ trước",
+            icon: "👨‍🎓",
+          },
+          {
+            id: 2,
+            type: "payment",
+            message: "Thanh toán học phí khóa học Vật lý",
+            time: "4 giờ trước",
+            icon: "💰",
+          },
+          {
+            id: 3,
+            type: "schedule",
+            message: "Lịch học mới được tạo cho tuần này",
+            time: "1 ngày trước",
+            icon: "📅",
+          },
+        ]);
+      }
     } catch (error) {
       console.error("Error loading dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initializeSampleData = async () => {
+    try {
+      if (window.electronAPI) {
+        await window.electronAPI.initializeSampleData();
+        loadDashboardData(); // Reload data after initialization
+        alert("Dữ liệu mẫu đã được khởi tạo thành công!");
+      }
+    } catch (error) {
+      console.error("Error initializing sample data:", error);
+      alert("Có lỗi xảy ra khi khởi tạo dữ liệu mẫu");
     }
   };
 
@@ -75,6 +93,13 @@ function Dashboard({ dbManager }) {
       <div className="dashboard-header">
         <h1 className="dashboard-title">Dashboard</h1>
         <p className="dashboard-subtitle">Tổng quan hệ thống quản lý dạy học</p>
+        <button
+          className="btn btn-secondary"
+          onClick={initializeSampleData}
+          style={{ marginTop: "10px" }}
+        >
+          Khởi tạo dữ liệu mẫu
+        </button>
       </div>
 
       <div className="stats-grid">

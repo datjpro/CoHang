@@ -1,6 +1,6 @@
 import React from "react";
 
-function Payments({ dbManager }) {
+function Payments() {
   return (
     <div className="payments-page">
       <div className="page-header">

@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from "react";
 import StudentModal from "../components/StudentModal";
 
-function Students({ dbManager }) {
+function Students() {
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (dbManager) {
-      loadStudents();
-    }
-  }, [dbManager]);
+    loadStudents();
+  }, []);
 
-  const loadStudents = () => {
+  const loadStudents = async () => {
     try {
-      const studentList = dbManager.getAllStudents();
-      setStudents(studentList);
+      setLoading(true);
+      if (window.electronAPI) {
+        const studentList = await window.electronAPI.getAllStudents();
+        setStudents(studentList);
+      }
     } catch (error) {
       console.error("Error loading students:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,28 +35,33 @@ function Students({ dbManager }) {
     setEditingStudent(student);
     setIsModalOpen(true);
   };
-
-  const handleDeleteStudent = (id) => {
+  const handleDeleteStudent = async (id) => {
     if (window.confirm("Bạn có chắc muốn xóa học sinh này?")) {
       try {
-        dbManager.deleteStudent(id);
-        loadStudents();
+        if (window.electronAPI) {
+          await window.electronAPI.deleteStudent(id);
+          loadStudents();
+        }
       } catch (error) {
         console.error("Error deleting student:", error);
         alert("Có lỗi xảy ra khi xóa học sinh");
       }
     }
   };
-
-  const handleSaveStudent = (studentData) => {
+  const handleSaveStudent = async (studentData) => {
     try {
-      if (editingStudent) {
-        dbManager.updateStudent(editingStudent.ma_hoc_sinh, studentData);
-      } else {
-        dbManager.createStudent(studentData);
+      if (window.electronAPI) {
+        if (editingStudent) {
+          await window.electronAPI.updateStudent(
+            editingStudent.ma_hoc_sinh,
+            studentData
+          );
+        } else {
+          await window.electronAPI.createStudent(studentData);
+        }
+        loadStudents();
+        setIsModalOpen(false);
       }
-      loadStudents();
-      setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving student:", error);
       alert("Có lỗi xảy ra khi lưu thông tin học sinh");

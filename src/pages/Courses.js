@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from "react";
 
-function Courses({ dbManager }) {
+function Courses() {
   const [courses, setCourses] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (dbManager) {
-      loadData();
-    }
-  }, [dbManager]);
+    loadData();
+  }, []);
 
-  const loadData = () => {
+  const loadData = async () => {
     try {
-      const courseList = dbManager.getAllCourses();
-      const teacherList = dbManager.getAllTeachers();
-      const subjectList = dbManager.getAllSubjects();
+      setLoading(true);
+      if (window.electronAPI) {
+        const [courseList, teacherList, subjectList] = await Promise.all([
+          window.electronAPI.getAllCourses(),
+          window.electronAPI.getAllTeachers(),
+          window.electronAPI.getAllSubjects(),
+        ]);
 
-      setCourses(courseList);
-      setTeachers(teacherList);
-      setSubjects(subjectList);
+        setCourses(courseList);
+        setTeachers(teacherList);
+        setSubjects(subjectList);
+      }
     } catch (error) {
       console.error("Error loading courses data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 

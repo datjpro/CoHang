@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from "react";
 import TeacherModal from "../components/TeacherModal";
 
-function Teachers({ dbManager }) {
+function Teachers() {
   const [teachers, setTeachers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (dbManager) {
-      loadTeachers();
-    }
-  }, [dbManager]);
+    loadTeachers();
+  }, []);
 
-  const loadTeachers = () => {
+  const loadTeachers = async () => {
     try {
-      const teacherList = dbManager.getAllTeachers();
-      setTeachers(teacherList);
+      setLoading(true);
+      if (window.electronAPI) {
+        const teacherList = await window.electronAPI.getAllTeachers();
+        setTeachers(teacherList);
+      }
     } catch (error) {
       console.error("Error loading teachers:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,12 +36,13 @@ function Teachers({ dbManager }) {
     setEditingTeacher(teacher);
     setIsModalOpen(true);
   };
-
-  const handleDeleteTeacher = (id) => {
+  const handleDeleteTeacher = async (id) => {
     if (window.confirm("Bạn có chắc muốn xóa giáo viên này?")) {
       try {
-        dbManager.deleteTeacher(id);
-        loadTeachers();
+        if (window.electronAPI) {
+          await window.electronAPI.deleteTeacher(id);
+          loadTeachers();
+        }
       } catch (error) {
         console.error("Error deleting teacher:", error);
         alert("Có lỗi xảy ra khi xóa giáo viên");
@@ -45,15 +50,20 @@ function Teachers({ dbManager }) {
     }
   };
 
-  const handleSaveTeacher = (teacherData) => {
+  const handleSaveTeacher = async (teacherData) => {
     try {
-      if (editingTeacher) {
-        dbManager.updateTeacher(editingTeacher.ma_giao_vien, teacherData);
-      } else {
-        dbManager.createTeacher(teacherData);
+      if (window.electronAPI) {
+        if (editingTeacher) {
+          await window.electronAPI.updateTeacher(
+            editingTeacher.ma_giao_vien,
+            teacherData
+          );
+        } else {
+          await window.electronAPI.createTeacher(teacherData);
+        }
+        loadTeachers();
+        setIsModalOpen(false);
       }
-      loadTeachers();
-      setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving teacher:", error);
       alert("Có lỗi xảy ra khi lưu thông tin giáo viên");
