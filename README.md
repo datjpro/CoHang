@@ -171,7 +171,7 @@ Dự án này được phân phối dưới giấy phép MIT. Xem file [LICENSE]
 ## 📞 Liên hệ
 
 - **Email:** todat2207@gmail.com
-- **GitHub:** [@username](https://github.com/datjpro)
+- **GitHub:** [DatjxLeon](https://github.com/datjpro)
 
 ## 🙏 Lời cảm ơn
 
