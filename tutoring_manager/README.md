@@ -1,16 +1,149 @@
-# tutoring_manager
+# Ứng dụng Quản lý Dạy Thêm
 
-A new Flutter project.
+Ứng dụng desktop được phát triển bằng Flutter để quản lý các lớp dạy thêm cho giáo viên.
 
-## Getting Started
+## Tính năng chính
 
-This project is a starting point for a Flutter application.
+### 🔐 Đăng nhập giáo viên
 
-A few resources to get you started if this is your first Flutter project:
+- Xác thực tài khoản giáo viên
+- Tài khoản mặc định: `admin` / `123456`
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 📚 Quản lý lớp học
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Tạo lớp học cho các môn: Toán, Lý, Hóa, Sinh, Tiếng Anh, Văn
+- Thiết lập lịch học cho mỗi lớp
+- Lưu link group chat của lớp
+- Sửa và xóa thông tin lớp học
+
+### 👥 Quản lý học sinh
+
+- Thêm học sinh vào lớp
+- Thông tin chi tiết: Họ tên (riêng biệt), lớp học ở trường, số điện thoại
+- Thông tin phụ huynh: Tên và số điện thoại
+- Sửa và xóa thông tin học sinh
+
+### 💾 Cơ sở dữ liệu
+
+- Sử dụng SQLite được lưu cục bộ
+- Không cần kết nối internet
+- Dữ liệu được lưu an toàn trong thư mục ứng dụng
+
+## Cài đặt và chạy
+
+### Yêu cầu hệ thống
+
+- Windows 10/11 (64-bit)
+- Hoặc macOS 10.14 trở lên
+- Hoặc Linux (Ubuntu 18.04 trở lên)
+
+### Chạy từ mã nguồn
+
+1. **Cài đặt Flutter SDK:** https://flutter.dev/docs/get-started/install
+2. **Cài đặt Visual Studio Community 2022** (cho Windows):
+   - Tải từ: https://visualstudio.microsoft.com/downloads/
+   - Chọn workload: **"Desktop development with C++"**
+   - Bao gồm: MSVC v142 build tools, C++ CMake tools, Windows 10/11 SDK
+3. **Clone project và chạy:**
+
+```bash
+cd tutoring_manager
+flutter pub get
+
+# Kiểm tra thiết lập
+flutter doctor
+
+# Chạy ứng dụng
+flutter run -d windows  # hoặc -d macos, -d linux
+
+# Hoặc chạy trên web (không cần Visual Studio)
+flutter run -d chrome
+```
+
+**Lưu ý:** Nếu gặp lỗi Visual Studio toolchain, xem file `fix_visual_studio.md` để biết cách khắc phục.
+
+### Build ứng dụng để phân phối
+
+```bash
+# Build cho Windows
+flutter build windows --release
+
+# Build cho macOS
+flutter build macos --release
+
+# Build cho Linux
+flutter build linux --release
+```
+
+File thực thi sẽ được tạo trong thư mục `build/`.
+
+## Cấu trúc dự án
+
+```
+lib/
+├── main.dart                 # Điểm khởi đầu ứng dụng
+├── models/                   # Các model dữ liệu
+│   ├── teacher.dart         # Model giáo viên
+│   ├── classroom.dart       # Model lớp học
+│   └── student.dart         # Model học sinh & điểm danh
+├── services/                # Các service
+│   └── database_service.dart # Service quản lý SQLite
+├── providers/               # State management
+│   ├── auth_provider.dart   # Quản lý đăng nhập
+│   └── classroom_provider.dart # Quản lý lớp học & học sinh
+├── screens/                 # Các màn hình
+│   ├── login_screen.dart    # Màn hình đăng nhập
+│   └── home_screen.dart     # Màn hình chính
+└── widgets/                 # Các widget tái sử dụng
+    ├── classroom_form_dialog.dart # Dialog thêm/sửa lớp
+    └── student_form_dialog.dart   # Dialog thêm/sửa học sinh
+```
+
+## Hướng dẫn sử dụng
+
+### 1. Đăng nhập
+
+- Mở ứng dụng và sử dụng tài khoản mặc định:
+  - **Tên đăng nhập:** `admin`
+  - **Mật khẩu:** `123456`
+
+### 2. Quản lý lớp học
+
+- Nhấn nút **"Thêm lớp"** để tạo lớp mới
+- Điền thông tin: Tên lớp, Môn học, Lịch học, Link group chat
+- Nhấn vào lớp bên trái để xem danh sách học sinh
+- Sử dụng menu ⋮ để sửa, xóa hoặc mở group chat
+
+### 3. Quản lý học sinh
+
+- Chọn một lớp học trước
+- Nhấn **"Thêm học sinh"** để thêm học sinh mới
+- Điền đầy đủ thông tin cá nhân và thông tin phụ huynh
+- Sử dụng menu ⋮ để sửa hoặc xóa học sinh
+
+### 4. Tính năng khác
+
+- **Mở group chat:** Nhấn vào menu lớp học và chọn "Mở group chat"
+- **Đăng xuất:** Nhấn vào avatar góc phải và chọn "Đăng xuất"
+
+## Phát triển tương lai
+
+Ứng dụng có thể mở rộng thêm các tính năng:
+
+- ✅ Quản lý điểm danh học sinh
+- ✅ Báo cáo thống kê
+- ✅ Quản lý học phí
+- ✅ Gửi thông báo cho phụ huynh
+- ✅ Sao lưu và khôi phục dữ liệu
+- ✅ In ấn báo cáo
+
+## Hỗ trợ
+
+Nếu gặp vấn đề hoặc cần hỗ trợ, vui lòng liên hệ qua:
+
+- Email: [email hỗ trợ]
+- Điện thoại: [số điện thoại]
+
+## Bản quyền
+
+© 2025 - Ứng dụng Quản lý Dạy Thêm

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../models/teacher.dart';
 import '../models/classroom.dart';
@@ -14,25 +15,35 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    
+
     // Initialize SQLite for desktop
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
-    
+
     _database = await _initDatabase();
     return _database!;
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'tutoring_manager.db');
-    
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
+    // Get the application documents directory for desktop
+    Directory appDir;
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      appDir = await getApplicationDocumentsDirectory();
+    } else {
+      appDir = await getApplicationDocumentsDirectory();
+    }
+
+    // Create a subdirectory for our app
+    final dbDir = Directory(join(appDir.path, 'TutoringManager'));
+    if (!await dbDir.exists()) {
+      await dbDir.create(recursive: true);
+    }
+    String path = join(dbDir.path, 'tutoring_manager.db');
+    // Database will be created at: $path
+
+    return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -157,11 +168,7 @@ class DatabaseService {
 
   Future<void> deleteClassRoom(int id) async {
     final db = await database;
-    await db.delete(
-      'classrooms',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('classrooms', where: 'id = ?', whereArgs: [id]);
   }
 
   // Student methods
@@ -193,11 +200,7 @@ class DatabaseService {
 
   Future<void> deleteStudent(int id) async {
     final db = await database;
-    await db.delete(
-      'students',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('students', where: 'id = ?', whereArgs: [id]);
   }
 
   // Attendance methods
@@ -217,24 +220,27 @@ class DatabaseService {
     return List.generate(maps.length, (i) => Attendance.fromMap(maps[i]));
   }
 
-  Future<List<Attendance>> getAttendanceByDate(int classRoomId, DateTime date) async {
+  Future<List<Attendance>> getAttendanceByDate(
+    int classRoomId,
+    DateTime date,
+  ) async {
     final db = await database;
     // Get all students in the classroom first
     final students = await getStudentsByClassRoom(classRoomId);
     List<Attendance> attendances = [];
-    
+
     for (var student in students) {
       final maps = await db.query(
         'attendance',
         where: 'studentId = ? AND date = ?',
         whereArgs: [student.id, date.millisecondsSinceEpoch],
       );
-      
+
       if (maps.isNotEmpty) {
         attendances.add(Attendance.fromMap(maps.first));
       }
     }
-    
+
     return attendances;
   }
 
@@ -250,11 +256,7 @@ class DatabaseService {
 
   Future<void> deleteAttendance(int id) async {
     final db = await database;
-    await db.delete(
-      'attendance',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('attendance', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> close() async {
