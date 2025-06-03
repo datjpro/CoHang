@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      
+
       final success = await authProvider.login(
         _usernameController.text.trim(),
         _passwordController.text,
@@ -48,10 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Colors.blue.shade400,
-              Colors.purple.shade600,
-            ],
+            colors: [Colors.blue.shade400, Colors.purple.shade600],
           ),
         ),
         child: Center(
@@ -84,11 +81,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Title
                       Text(
                         'Quản lý dạy thêm',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        style: Theme.of(
+                          context,
+                        ).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.grey.shade800,
                         ),
@@ -132,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: const Icon(Icons.lock),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              _obscurePassword
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
                             onPressed: () {
                               setState(() {
@@ -170,12 +171,18 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.error, color: Colors.red.shade600, size: 20),
+                                  Icon(
+                                    Icons.error,
+                                    color: Colors.red.shade600,
+                                    size: 20,
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       authProvider.errorMessage!,
-                                      style: TextStyle(color: Colors.red.shade600),
+                                      style: TextStyle(
+                                        color: Colors.red.shade600,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -202,22 +209,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 elevation: 2,
                               ),
-                              child: authProvider.isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              child:
+                                  authProvider.isLoading
+                                      ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                      : const Text(
+                                        'Đăng nhập',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    )
-                                  : const Text(
-                                      'Đăng nhập',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
                             ),
                           );
                         },
@@ -236,7 +247,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.info, color: Colors.blue.shade600, size: 16),
+                                Icon(
+                                  Icons.info,
+                                  color: Colors.blue.shade600,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Tài khoản mặc định:',
