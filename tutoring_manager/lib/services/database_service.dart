@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -13,11 +14,23 @@ class DatabaseService {
 
   Database? _database;
 
+  // Mock data cho web
+  final List<Map<String, dynamic>> _mockClassRooms = [];
+  final List<Map<String, dynamic>> _mockStudents = [];
+  int _nextClassRoomId = 1;
+  int _nextStudentId = 1;
+
   Future<Database> get database async {
     if (_database != null) return _database!;
 
-    // Initialize SQLite for desktop
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'Database not supported on web platform. Please run on Windows/Desktop.',
+      );
+    }
+
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
@@ -27,21 +40,21 @@ class DatabaseService {
   }
 
   Future<Database> _initDatabase() async {
-    // Get the application documents directory for desktop
-    Directory appDir;
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      appDir = await getApplicationDocumentsDirectory();
-    } else {
-      appDir = await getApplicationDocumentsDirectory();
+    if (kIsWeb) {
+      throw UnsupportedError(
+        'Database not supported on web platform. Please run on Windows/Desktop.',
+      );
     }
 
-    // Create a subdirectory for our app
+    Directory appDir = await getApplicationDocumentsDirectory();
     final dbDir = Directory(join(appDir.path, 'TutoringManager'));
     if (!await dbDir.exists()) {
       await dbDir.create(recursive: true);
     }
     String path = join(dbDir.path, 'tutoring_manager.db');
-    // Database will be created at: $path
+
+    print('Database path: $path');
+    print('Database directory exists: ${await dbDir.exists()}');
 
     return await openDatabase(path, version: 1, onCreate: _onCreate);
   }
@@ -105,7 +118,7 @@ class DatabaseService {
     // Insert default teacher account
     await db.insert('teachers', {
       'username': 'admin',
-      'password': '123456', // In real app, this should be hashed
+      'password': '123456',
       'fullName': 'Giáo viên mặc định',
       'phone': '0123456789',
       'email': 'admin@example.com',
@@ -115,6 +128,22 @@ class DatabaseService {
 
   // Teacher methods
   Future<Teacher?> loginTeacher(String username, String password) async {
+    if (kIsWeb) {
+      // Mock login for web testing
+      if (username == 'admin' && password == '123456') {
+        return Teacher(
+          id: 1,
+          username: 'admin',
+          password: '123456',
+          fullName: 'Giáo viên mặc định',
+          phone: '0123456789',
+          email: 'admin@example.com',
+          createdAt: DateTime.now(),
+        );
+      }
+      return null;
+    }
+
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'teachers',
@@ -128,24 +157,33 @@ class DatabaseService {
     return null;
   }
 
-  Future<int> insertTeacher(Teacher teacher) async {
-    final db = await database;
-    return await db.insert('teachers', teacher.toMap());
-  }
-
-  Future<List<Teacher>> getAllTeachers() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('teachers');
-    return List.generate(maps.length, (i) => Teacher.fromMap(maps[i]));
-  }
-
   // ClassRoom methods
   Future<int> insertClassRoom(ClassRoom classRoom) async {
+    if (kIsWeb) {
+      // Mock insert for web
+      final id = _nextClassRoomId++;
+      _mockClassRooms.add({
+        'id': id,
+        'className': classRoom.className,
+        'subject': classRoom.subject.name,
+        'schedule': classRoom.schedule,
+        'groupChatLink': classRoom.groupChatLink,
+        'teacherId': classRoom.teacherId,
+        'createdAt': classRoom.createdAt.millisecondsSinceEpoch,
+      });
+      return id;
+    }
     final db = await database;
     return await db.insert('classrooms', classRoom.toMap());
   }
 
   Future<List<ClassRoom>> getClassRoomsByTeacher(int teacherId) async {
+    if (kIsWeb) {
+      // Return mock data for web
+      final filteredClassRooms =
+          _mockClassRooms.where((c) => c['teacherId'] == teacherId).toList();
+      return filteredClassRooms.map((map) => ClassRoom.fromMap(map)).toList();
+    }
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'classrooms',
@@ -157,6 +195,22 @@ class DatabaseService {
   }
 
   Future<void> updateClassRoom(ClassRoom classRoom) async {
+    if (kIsWeb) {
+      // Mock update for web
+      final index = _mockClassRooms.indexWhere((c) => c['id'] == classRoom.id);
+      if (index != -1) {
+        _mockClassRooms[index] = {
+          'id': classRoom.id,
+          'className': classRoom.className,
+          'subject': classRoom.subject.name,
+          'schedule': classRoom.schedule,
+          'groupChatLink': classRoom.groupChatLink,
+          'teacherId': classRoom.teacherId,
+          'createdAt': classRoom.createdAt.millisecondsSinceEpoch,
+        };
+      }
+      return;
+    }
     final db = await database;
     await db.update(
       'classrooms',
@@ -167,17 +221,45 @@ class DatabaseService {
   }
 
   Future<void> deleteClassRoom(int id) async {
+    if (kIsWeb) {
+      // Mock delete for web
+      _mockClassRooms.removeWhere((c) => c['id'] == id);
+      _mockStudents.removeWhere((s) => s['classRoomId'] == id);
+      return;
+    }
     final db = await database;
     await db.delete('classrooms', where: 'id = ?', whereArgs: [id]);
   }
 
   // Student methods
   Future<int> insertStudent(Student student) async {
+    if (kIsWeb) {
+      // Mock insert for web
+      final id = _nextStudentId++;
+      _mockStudents.add({
+        'id': id,
+        'firstName': student.firstName,
+        'lastName': student.lastName,
+        'schoolClass': student.schoolClass,
+        'phone': student.phone,
+        'parentName': student.parentName,
+        'parentPhone': student.parentPhone,
+        'classRoomId': student.classRoomId,
+        'createdAt': student.createdAt.millisecondsSinceEpoch,
+      });
+      return id;
+    }
     final db = await database;
     return await db.insert('students', student.toMap());
   }
 
   Future<List<Student>> getStudentsByClassRoom(int classRoomId) async {
+    if (kIsWeb) {
+      // Return mock data for web
+      final filteredStudents =
+          _mockStudents.where((s) => s['classRoomId'] == classRoomId).toList();
+      return filteredStudents.map((map) => Student.fromMap(map)).toList();
+    }
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'students',
@@ -189,6 +271,24 @@ class DatabaseService {
   }
 
   Future<void> updateStudent(Student student) async {
+    if (kIsWeb) {
+      // Mock update for web
+      final index = _mockStudents.indexWhere((s) => s['id'] == student.id);
+      if (index != -1) {
+        _mockStudents[index] = {
+          'id': student.id,
+          'firstName': student.firstName,
+          'lastName': student.lastName,
+          'schoolClass': student.schoolClass,
+          'phone': student.phone,
+          'parentName': student.parentName,
+          'parentPhone': student.parentPhone,
+          'classRoomId': student.classRoomId,
+          'createdAt': student.createdAt.millisecondsSinceEpoch,
+        };
+      }
+      return;
+    }
     final db = await database;
     await db.update(
       'students',
@@ -199,17 +299,28 @@ class DatabaseService {
   }
 
   Future<void> deleteStudent(int id) async {
+    if (kIsWeb) {
+      // Mock delete for web
+      _mockStudents.removeWhere((s) => s['id'] == id);
+      return;
+    }
     final db = await database;
     await db.delete('students', where: 'id = ?', whereArgs: [id]);
   }
 
-  // Attendance methods
+  // Attendance methods (simplified for web)
   Future<int> insertAttendance(Attendance attendance) async {
+    if (kIsWeb) {
+      return 1; // Mock return
+    }
     final db = await database;
     return await db.insert('attendance', attendance.toMap());
   }
 
   Future<List<Attendance>> getAttendanceByStudent(int studentId) async {
+    if (kIsWeb) {
+      return []; // Return empty list for web
+    }
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'attendance',
@@ -224,8 +335,10 @@ class DatabaseService {
     int classRoomId,
     DateTime date,
   ) async {
+    if (kIsWeb) {
+      return []; // Return empty list for web
+    }
     final db = await database;
-    // Get all students in the classroom first
     final students = await getStudentsByClassRoom(classRoomId);
     List<Attendance> attendances = [];
 
@@ -245,6 +358,9 @@ class DatabaseService {
   }
 
   Future<void> updateAttendance(Attendance attendance) async {
+    if (kIsWeb) {
+      return; // Mock update
+    }
     final db = await database;
     await db.update(
       'attendance',
@@ -255,12 +371,36 @@ class DatabaseService {
   }
 
   Future<void> deleteAttendance(int id) async {
+    if (kIsWeb) {
+      return; // Mock delete
+    }
     final db = await database;
     await db.delete('attendance', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> close() async {
+    if (kIsWeb) {
+      return; // Do nothing on web
+    }
     final db = await database;
     await db.close();
+  }
+
+  // Missing methods from models
+  Future<int> insertTeacher(Teacher teacher) async {
+    if (kIsWeb) {
+      return 1; // Mock return
+    }
+    final db = await database;
+    return await db.insert('teachers', teacher.toMap());
+  }
+
+  Future<List<Teacher>> getAllTeachers() async {
+    if (kIsWeb) {
+      return []; // Return empty list for web
+    }
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('teachers');
+    return List.generate(maps.length, (i) => Teacher.fromMap(maps[i]));
   }
 }

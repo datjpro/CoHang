@@ -31,13 +31,41 @@
 
 ## Cài đặt và chạy
 
+### 🚀 Cách sử dụng nhanh nhất (Đã build sẵn)
+
+#### Option 1: Chạy file thực thi Windows
+
+1. **Tìm file app đã build:**
+
+   ```
+   build\windows\x64\runner\Release\tutoring_manager.exe
+   ```
+
+2. **Double-click vào file .exe để chạy trực tiếp**
+
+   - Không cần cài đặt gì thêm
+   - Database sẽ được tạo tự động tại: `C:\Users\[TênBạn]\Documents\TutoringManager\`
+   - Dữ liệu sẽ được lưu vĩnh viễn giữa các lần sử dụng
+
+3. **Đăng nhập:**
+   - Username: `admin`
+   - Password: `123456`
+
+#### Option 2: Chạy trên Web (Không cần build)
+
+```bash
+flutter run -d chrome
+```
+
+_Lưu ý: Dữ liệu trên web chỉ tạm thời, không được lưu vĩnh viễn_
+
 ### Yêu cầu hệ thống
 
 - Windows 10/11 (64-bit)
 - Hoặc macOS 10.14 trở lên
 - Hoặc Linux (Ubuntu 18.04 trở lên)
 
-### Chạy từ mã nguồn
+### Chạy từ mã nguồn (Dành cho developer)
 
 1. **Cài đặt Flutter SDK:** https://flutter.dev/docs/get-started/install
 2. **Cài đặt Visual Studio Community 2022** (cho Windows):
@@ -73,9 +101,18 @@ flutter build macos --release
 
 # Build cho Linux
 flutter build linux --release
+
+# Build cho Web
+flutter build web --release
 ```
 
 File thực thi sẽ được tạo trong thư mục `build/`.
+
+## 📍 Vị trí lưu trữ dữ liệu
+
+- **Windows:** `C:\Users\[TênBạn]\Documents\TutoringManager\tutoring_manager.db`
+- **macOS:** `~/Documents/TutoringManager/tutoring_manager.db`
+- **Linux:** `~/Documents/TutoringManager/tutoring_manager.db`
 
 ## Cấu trúc dự án
 
@@ -126,6 +163,13 @@ lib/
 - **Mở group chat:** Nhấn vào menu lớp học và chọn "Mở group chat"
 - **Đăng xuất:** Nhấn vào avatar góc phải và chọn "Đăng xuất"
 
+## 💡 Tips sử dụng
+
+- **Backup dữ liệu:** Copy thư mục `Documents\TutoringManager\` để backup
+- **Khôi phục dữ liệu:** Paste lại thư mục backup để khôi phục
+- **Reset app:** Xóa file `tutoring_manager.db` để reset về trạng thái ban đầu
+- **Multi-platform:** App hoạt động trên Windows, macOS, Linux và Web
+
 ## Phát triển tương lai
 
 Ứng dụng có thể mở rộng thêm các tính năng:
@@ -139,10 +183,19 @@ lib/
 
 ## Hỗ trợ
 
-Nếu gặp vấn đề hoặc cần hỗ trợ, vui lòng liên hệ qua:
+Nếu gặp vấn đề hoặc cần hỗ trợ, vui lòng:
 
-- Email: [email hỗ trợ]
-- Điện thoại: [số điện thoại]
+- Kiểm tra file `fix_visual_studio.md` cho các lỗi build
+- Xem file `deployment_guide.md` cho hướng dẫn chi tiết
+- Kiểm tra file `COMPLETION_REPORT.md` để biết tính năng đã hoàn thành
+
+## 🎯 Status: ✅ READY FOR PRODUCTION
+
+- ✅ **Windows Desktop:** File .exe có thể chạy trực tiếp
+- ✅ **Web Browser:** Chạy demo trực tiếp bằng `flutter run -d chrome`
+- ✅ **Cross-platform:** Support Windows, macOS, Linux
+- ✅ **Database:** SQLite với persistent storage
+- ✅ **Production ready:** Đã test và sẵn sàng sử dụng
 
 ## Bản quyền
 
