@@ -21,8 +21,15 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
   late TextEditingController _lastNameController;
   late TextEditingController _schoolClassController;
   late TextEditingController _phoneController;
-  late TextEditingController _parentNameController;
-  late TextEditingController _parentPhoneController;
+  late TextEditingController _guardianNameController;
+  late TextEditingController _guardianPhoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _birthPlaceController;
+  late TextEditingController _currentAddressController;
+  late TextEditingController _noteController;
+
+  String _selectedGender = 'Nam';
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -37,12 +44,24 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
       text: widget.student?.schoolClass ?? '',
     );
     _phoneController = TextEditingController(text: widget.student?.phone ?? '');
-    _parentNameController = TextEditingController(
-      text: widget.student?.parentName ?? '',
+    _guardianNameController = TextEditingController(
+      text: widget.student?.guardianName ?? '',
     );
-    _parentPhoneController = TextEditingController(
-      text: widget.student?.parentPhone ?? '',
+    _guardianPhoneController = TextEditingController(
+      text: widget.student?.guardianPhone ?? '',
     );
+    _emailController = TextEditingController(text: widget.student?.email ?? '');
+    _birthPlaceController = TextEditingController(
+      text: widget.student?.birthPlace ?? '',
+    );
+    _currentAddressController = TextEditingController(
+      text: widget.student?.currentAddress ?? '',
+    );
+    _noteController = TextEditingController(text: widget.student?.note ?? '');
+    if (widget.student != null) {
+      _selectedGender = widget.student!.gender;
+      _selectedDate = widget.student!.dateOfBirth;
+    }
   }
 
   @override
@@ -51,8 +70,12 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
     _lastNameController.dispose();
     _schoolClassController.dispose();
     _phoneController.dispose();
-    _parentNameController.dispose();
-    _parentPhoneController.dispose();
+    _guardianNameController.dispose();
+    _guardianPhoneController.dispose();
+    _emailController.dispose();
+    _birthPlaceController.dispose();
+    _currentAddressController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -62,25 +85,32 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
         context,
         listen: false,
       );
-
       final student = Student(
         id: widget.student?.id,
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
+        gender: _selectedGender,
+        dateOfBirth: _selectedDate,
+        birthPlace: _birthPlaceController.text.trim(),
+        currentAddress: _currentAddressController.text.trim(),
         schoolClass: _schoolClassController.text.trim(),
-        phone: _phoneController.text.trim(),
-        parentName: _parentNameController.text.trim(),
-        parentPhone: _parentPhoneController.text.trim(),
+        phone:
+            _phoneController.text.trim().isEmpty
+                ? null
+                : _phoneController.text.trim(),
+        guardianName: _guardianNameController.text.trim(),
+        guardianPhone: _guardianPhoneController.text.trim(),
+        email: _emailController.text.trim(),
+        ethnicity: 'Kinh',
+        note: _noteController.text.trim(),
         classRoomId: widget.classRoomId,
         createdAt: widget.student?.createdAt ?? DateTime.now(),
       );
-
       if (widget.isEdit) {
         await classRoomProvider.updateStudent(student);
       } else {
         await classRoomProvider.addStudent(student);
       }
-
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -141,17 +171,15 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-
-                // Name fields row
+                const SizedBox(height: 24), // Name fields row
                 Row(
                   children: [
                     Expanded(
                       child: TextFormField(
                         controller: _lastNameController,
                         decoration: InputDecoration(
-                          labelText: 'Họ *',
-                          hintText: 'Nguyễn',
+                          labelText: 'Họ và tên đệm *',
+                          hintText: 'Nguyễn Văn',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -160,7 +188,7 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Vui lòng nhập họ';
+                            return 'Vui lòng nhập họ và tên đệm';
                           }
                           return null;
                         },
@@ -172,7 +200,7 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                         controller: _firstNameController,
                         decoration: InputDecoration(
                           labelText: 'Tên *',
-                          hintText: 'Văn A',
+                          hintText: 'A',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -191,9 +219,90 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // School class and phone row
+                // Gender and Date of Birth row
                 Row(
                   children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedGender,
+                        decoration: InputDecoration(
+                          labelText: 'Giới tính *',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                        items:
+                            ['Nam', 'Nữ', 'Khác'].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedGender = newValue!;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDate,
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null && picked != _selectedDate) {
+                            setState(() {
+                              _selectedDate = picked;
+                            });
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'Ngày sinh *',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                            suffixIcon: const Icon(Icons.calendar_today),
+                          ),
+                          child: Text(
+                            '${_selectedDate.day.toString().padLeft(2, '0')}/'
+                            '${_selectedDate.month.toString().padLeft(2, '0')}/'
+                            '${_selectedDate.year}',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Birth place and School class row
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _birthPlaceController,
+                        decoration: InputDecoration(
+                          labelText: 'Nơi sinh',
+                          hintText: 'Hà Nội',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: TextFormField(
                         controller: _schoolClassController,
@@ -214,13 +323,57 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                         },
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Current address
+                TextFormField(
+                  controller: _currentAddressController,
+                  decoration: InputDecoration(
+                    labelText: 'Địa chỉ hiện tại',
+                    hintText:
+                        'Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.shade50,
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 16),
+
+                // Guardian info and contact row
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _guardianNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Tên người thân *',
+                          hintText: 'Nguyễn Văn B',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Vui lòng nhập tên người thân';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                          labelText: 'Số điện thoại *',
+                          labelText: 'Số điện thoại học sinh',
                           hintText: '0123456789',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -235,41 +388,69 @@ class _StudentFormDialogState extends State<StudentFormDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Parent name field
-                TextFormField(
-                  controller: _parentNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Tên phụ huynh *',
-                    hintText: 'Nguyễn Văn B',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                // Guardian phone and Email row
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _guardianPhoneController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Số điện thoại người thân *',
+                          hintText: '0123456789',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                        validator: _validatePhone,
+                      ),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Vui lòng nhập tên phụ huynh';
-                    }
-                    return null;
-                  },
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          hintText: 'email@example.com',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                        validator: (value) {
+                          if (value != null && value.trim().isNotEmpty) {
+                            final emailRegex = RegExp(
+                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                            );
+                            if (!emailRegex.hasMatch(value.trim())) {
+                              return 'Email không hợp lệ';
+                            }
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
-                // Parent phone field
+                // Note field
                 TextFormField(
-                  controller: _parentPhoneController,
-                  keyboardType: TextInputType.phone,
+                  controller: _noteController,
                   decoration: InputDecoration(
-                    labelText: 'Số điện thoại phụ huynh *',
-                    hintText: '0123456789',
+                    labelText: 'Ghi chú',
+                    hintText: 'Thông tin bổ sung về học sinh...',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     filled: true,
                     fillColor: Colors.grey.shade50,
                   ),
-                  validator: _validatePhone,
+                  maxLines: 3,
                 ),
                 const SizedBox(height: 24),
 
