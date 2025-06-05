@@ -341,6 +341,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const PopupMenuDivider(),
                       PopupMenuItem<void>(
+                        onTap: () => Navigator.pushNamed(context, '/debug'),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.bug_report, size: 18),
+                            SizedBox(width: 8),
+                            Text('Database Debug'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<void>(
                         onTap: _logout,
                         child: const Row(
                           children: [
@@ -627,313 +637,341 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                               )
-                              : SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
+                              : Container(
+                                padding: const EdgeInsets.all(16),
                                 child: SingleChildScrollView(
-                                  child: Container(
-                                    margin: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey.shade300,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
+                                  scrollDirection: Axis.horizontal,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minWidth:
+                                          MediaQuery.of(context).size.width -
+                                          400, // Subtract left panel width
                                     ),
-                                    child: DataTable(
-                                      headingRowColor:
-                                          MaterialStateProperty.all(
-                                            Colors.blue.shade50,
-                                          ),
-                                      border: TableBorder.all(
-                                        color: Colors.grey.shade300,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: Colors.white,
                                       ),
-                                      columnSpacing: 20,
-                                      horizontalMargin: 16,
-                                      columns: const [
-                                        DataColumn(
-                                          label: Text(
-                                            'STT',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                      child: DataTable(
+                                        headingRowColor:
+                                            MaterialStateProperty.all(
+                                              Colors.blue.shade50,
+                                            ),
+                                        border: TableBorder.all(
+                                          color: Colors.grey.shade300,
+                                        ),
+                                        columnSpacing: 20,
+                                        horizontalMargin: 16,
+                                        dataRowMinHeight: 48,
+                                        dataRowMaxHeight: 56,
+                                        columns: const [
+                                          DataColumn(
+                                            label: Text(
+                                              'STT',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Họ và tên đệm',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Họ và tên đệm',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Tên',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Tên',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Giới tính',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Giới tính',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Ngày sinh',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Ngày sinh',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Nơi sinh',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Nơi sinh',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Địa chỉ hiện tại',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Địa chỉ hiện tại',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Lớp',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Lớp',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'SĐT học sinh',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'SĐT học sinh',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Người thân',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Người thân',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'SĐT người thân',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'SĐT người thân',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Email',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Email',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Ghi chú',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Ghi chú',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Thao tác',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          DataColumn(
+                                            label: Text(
+                                              'Thao tác',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                      rows:
-                                          classRoomProvider.students.asMap().entries.map((
-                                            entry,
-                                          ) {
-                                            final index = entry.key;
-                                            final student = entry.value;
-                                            final id = student.id!;
-                                            return DataRow(
-                                              cells: [
-                                                DataCell(Text('${index + 1}')),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'lastName',
-                                                    value: student.lastName,
-                                                    student: student,
-                                                    provider: classRoomProvider,
+                                        ],
+                                        rows:
+                                            classRoomProvider.students.asMap().entries.map((
+                                              entry,
+                                            ) {
+                                              final index = entry.key;
+                                              final student = entry.value;
+                                              final id = student.id!;
+                                              return DataRow(
+                                                cells: [
+                                                  DataCell(
+                                                    Text('${index + 1}'),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'firstName',
-                                                    value: student.firstName,
-                                                    student: student,
-                                                    provider: classRoomProvider,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'lastName',
+                                                      value: student.lastName,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'gender',
-                                                    value: student.gender,
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    isDropdown: true,
-                                                    dropdownItems: [
-                                                      'Nam',
-                                                      'Nữ',
-                                                      'Khác',
-                                                    ],
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'firstName',
+                                                      value: student.firstName,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'dateOfBirth',
-                                                    value:
-                                                        '${student.dateOfBirth.day.toString().padLeft(2, '0')}/'
-                                                        '${student.dateOfBirth.month.toString().padLeft(2, '0')}/'
-                                                        '${student.dateOfBirth.year}',
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 100,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'gender',
+                                                      value: student.gender,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      isDropdown: true,
+                                                      dropdownItems: [
+                                                        'Nam',
+                                                        'Nữ',
+                                                        'Khác',
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'birthPlace',
-                                                    value: student.birthPlace,
-                                                    student: student,
-                                                    provider: classRoomProvider,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'dateOfBirth',
+                                                      value:
+                                                          '${student.dateOfBirth.day.toString().padLeft(2, '0')}/'
+                                                          '${student.dateOfBirth.month.toString().padLeft(2, '0')}/'
+                                                          '${student.dateOfBirth.year}',
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 100,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'currentAddress',
-                                                    value:
-                                                        student.currentAddress,
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 180,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'birthPlace',
+                                                      value: student.birthPlace,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'schoolClass',
-                                                    value: student.schoolClass,
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 80,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'currentAddress',
+                                                      value:
+                                                          student
+                                                              .currentAddress,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 180,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'phone',
-                                                    value: student.phone ?? '',
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 120,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'schoolClass',
+                                                      value:
+                                                          student.schoolClass,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 80,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'guardianName',
-                                                    value: student.guardianName,
-                                                    student: student,
-                                                    provider: classRoomProvider,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'phone',
+                                                      value:
+                                                          student.phone ?? '',
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 120,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'guardianPhone',
-                                                    value:
-                                                        student.guardianPhone,
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 120,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'guardianName',
+                                                      value:
+                                                          student.guardianName,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'email',
-                                                    value: student.email,
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 140,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'guardianPhone',
+                                                      value:
+                                                          student.guardianPhone,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 120,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  _editableCell(
-                                                    studentId: id,
-                                                    field: 'note',
-                                                    value: student.note ?? '',
-                                                    student: student,
-                                                    provider: classRoomProvider,
-                                                    width: 120,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'email',
+                                                      value: student.email,
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 140,
+                                                    ),
                                                   ),
-                                                ),
-                                                DataCell(
-                                                  Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                          Icons.edit,
-                                                          size: 18,
+                                                  DataCell(
+                                                    _editableCell(
+                                                      studentId: id,
+                                                      field: 'note',
+                                                      value: student.note ?? '',
+                                                      student: student,
+                                                      provider:
+                                                          classRoomProvider,
+                                                      width: 120,
+                                                    ),
+                                                  ),
+                                                  DataCell(
+                                                    Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        IconButton(
+                                                          icon: const Icon(
+                                                            Icons.edit,
+                                                            size: 18,
+                                                          ),
+                                                          onPressed:
+                                                              () =>
+                                                                  _showEditStudentDialog(
+                                                                    student,
+                                                                  ),
+                                                          tooltip: 'Sửa',
                                                         ),
-                                                        onPressed:
-                                                            () =>
-                                                                _showEditStudentDialog(
-                                                                  student,
-                                                                ),
-                                                        tooltip: 'Sửa',
-                                                      ),
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                          Icons.delete,
-                                                          size: 18,
-                                                          color: Colors.red,
+                                                        IconButton(
+                                                          icon: const Icon(
+                                                            Icons.delete,
+                                                            size: 18,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed:
+                                                              () =>
+                                                                  _deleteStudent(
+                                                                    student,
+                                                                  ),
+                                                          tooltip: 'Xóa',
                                                         ),
-                                                        onPressed:
-                                                            () =>
-                                                                _deleteStudent(
-                                                                  student,
-                                                                ),
-                                                        tooltip: 'Xóa',
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            );
-                                          }).toList(),
+                                                ],
+                                              );
+                                            }).toList(),
+                                      ),
                                     ),
                                   ),
                                 ),

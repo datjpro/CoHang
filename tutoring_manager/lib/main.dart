@@ -7,6 +7,7 @@ import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/database_debug_screen.dart';
 
 void main() {
   // Khởi tạo sqflite_ffi cho desktop platforms
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
                 : const LoginScreen();
           },
         ),
+        routes: {'/debug': (context) => const DatabaseDebugScreen()},
       ),
     );
   }

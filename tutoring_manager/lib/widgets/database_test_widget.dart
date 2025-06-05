@@ -31,15 +31,15 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
     try {
       // Test database connection
       _connectionTest = await _dbService.testConnection();
-      
+
       // Check database integrity
       _integrityCheck = await _dbService.checkDatabaseIntegrity();
-      
+
       // Get database statistics if connection is successful
       if (_connectionTest) {
         _stats = await _dbService.getDatabaseStats();
       }
-      
+
       setState(() {
         _isLoading = false;
       });
@@ -64,16 +64,16 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
         );
         _testDatabase(); // Re-test after repair
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Database repair failed')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Database repair failed')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Repair error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Repair error: $e')));
     }
-    
+
     setState(() {
       _isLoading = false;
     });
@@ -94,10 +94,7 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
                 const SizedBox(width: 8),
                 const Text(
                   'Database Status',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
                 IconButton(
@@ -107,7 +104,7 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             if (_isLoading)
               const Center(
                 child: Column(
@@ -143,10 +140,7 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      _error!,
-                      style: TextStyle(color: Colors.red.shade700),
-                    ),
+                    Text(_error!, style: TextStyle(color: Colors.red.shade700)),
                   ],
                 ),
               )
@@ -157,40 +151,44 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _connectionTest 
-                          ? Colors.green.shade50 
-                          : Colors.orange.shade50,
+                      color:
+                          _connectionTest
+                              ? Colors.green.shade50
+                              : Colors.orange.shade50,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: _connectionTest 
-                            ? Colors.green.shade200 
-                            : Colors.orange.shade200,
+                        color:
+                            _connectionTest
+                                ? Colors.green.shade200
+                                : Colors.orange.shade200,
                       ),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           _connectionTest ? Icons.check_circle : Icons.warning,
-                          color: _connectionTest 
-                              ? Colors.green.shade600 
-                              : Colors.orange.shade600,
+                          color:
+                              _connectionTest
+                                  ? Colors.green.shade600
+                                  : Colors.orange.shade600,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _connectionTest 
-                              ? 'Database Connected Successfully' 
+                          _connectionTest
+                              ? 'Database Connected Successfully'
                               : 'Database Connection Failed',
                           style: TextStyle(
-                            color: _connectionTest 
-                                ? Colors.green.shade700 
-                                : Colors.orange.shade700,
+                            color:
+                                _connectionTest
+                                    ? Colors.green.shade700
+                                    : Colors.orange.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   if (_stats != null) ...[
                     const SizedBox(height: 16),
                     const Text(
@@ -201,45 +199,51 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    
-                    ..._stats!.entries.map((entry) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade400,
-                              shape: BoxShape.circle,
+
+                    ..._stats!.entries
+                        .map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade400,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  '${entry.key.substring(0, 1).toUpperCase()}${entry.key.substring(1)}:',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade50,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '${entry.value}',
+                                    style: TextStyle(
+                                      color: Colors.blue.shade700,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${entry.key.substring(0, 1).toUpperCase()}${entry.key.substring(1)}:',
-                            style: const TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '${entry.value}',
-                              style: TextStyle(
-                                color: Colors.blue.shade700,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )).toList(),
+                        )
+                        .toList(),
                   ],
                 ],
               ),

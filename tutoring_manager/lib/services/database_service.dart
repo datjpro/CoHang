@@ -38,10 +38,9 @@ class DatabaseService {
       path = join(dbDir.path, 'tutoring_manager.db');
       print('Database path: $path');
     }
-
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -122,6 +121,7 @@ class DatabaseService {
 
     print('Database initialized successfully with default data');
   }
+
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     print('Upgrading database from version $oldVersion to $newVersion');
 
@@ -159,6 +159,24 @@ class DatabaseService {
       }
     }
 
+    if (oldVersion < 3) {
+      // Add guardian columns that were missing in version 2
+      List<String> guardianColumns = [
+        'ALTER TABLE students ADD COLUMN guardianName TEXT NOT NULL DEFAULT ""',
+        'ALTER TABLE students ADD COLUMN guardianPhone TEXT NOT NULL DEFAULT ""',
+      ];
+
+      for (String alterQuery in guardianColumns) {
+        try {
+          await db.execute(alterQuery);
+          print('Successfully executed: $alterQuery');
+        } catch (e) {
+          print('Column might already exist or error: $e');
+          // Continue with next column
+        }
+      }
+    }
+
     print('Database upgrade completed');
   }
 
@@ -183,38 +201,39 @@ class DatabaseService {
       return null;
     }
   }
+
   // ClassRoom methods
   Future<int> insertClassRoom(ClassRoom classRoom) async {
     try {
       final db = await database;
-      
+
       // Validate classroom data
       if (classRoom.className.isEmpty) {
         throw Exception('Tên lớp học không được để trống');
       }
-      
+
       if (classRoom.schedule.isEmpty) {
         throw Exception('Lịch học không được để trống');
       }
-      
+
       if (classRoom.teacherId <= 0) {
         throw Exception('ID giáo viên không hợp lệ');
       }
-      
+
       // Check if teacher exists
       final teacherExists = await db.query(
         'teachers',
         where: 'id = ?',
         whereArgs: [classRoom.teacherId],
       );
-      
+
       if (teacherExists.isEmpty) {
         throw Exception('Giáo viên không tồn tại');
       }
-      
+
       final classRoomMap = classRoom.toMap();
       print('Inserting classroom data: $classRoomMap');
-      
+
       final result = await db.insert('classrooms', classRoomMap);
       print('Inserted classroom with ID: $result');
       return result;
@@ -265,38 +284,39 @@ class DatabaseService {
     await db.delete('classrooms', where: 'id = ?', whereArgs: [id]);
     print('Deleted classroom with ID: $id');
   }
+
   // Student methods
   Future<int> insertStudent(Student student) async {
     try {
       final db = await database;
-      
+
       // Validate student data before insertion
       if (student.firstName.isEmpty || student.lastName.isEmpty) {
         throw Exception('Tên và họ học sinh không được để trống');
       }
-      
+
       if (student.guardianName.isEmpty || student.guardianPhone.isEmpty) {
         throw Exception('Tên và số điện thoại người thân không được để trống');
       }
-      
+
       if (student.classRoomId <= 0) {
         throw Exception('ID lớp học không hợp lệ');
       }
-      
+
       // Check if classroom exists
       final classroomExists = await db.query(
         'classrooms',
         where: 'id = ?',
         whereArgs: [student.classRoomId],
       );
-      
+
       if (classroomExists.isEmpty) {
         throw Exception('Lớp học không tồn tại');
       }
-      
+
       final studentMap = student.toMap();
       print('Inserting student data: $studentMap');
-      
+
       final result = await db.insert('students', studentMap);
       print('Inserted student with ID: $result');
       return result;
@@ -337,27 +357,28 @@ class DatabaseService {
     await db.delete('students', where: 'id = ?', whereArgs: [id]);
     print('Deleted student with ID: $id');
   }
+
   // Attendance methods
   Future<int> insertAttendance(Attendance attendance) async {
     try {
       final db = await database;
-      
+
       // Validate attendance data
       if (attendance.studentId <= 0) {
         throw Exception('ID học sinh không hợp lệ');
       }
-      
+
       // Check if student exists
       final studentExists = await db.query(
         'students',
         where: 'id = ?',
         whereArgs: [attendance.studentId],
       );
-      
+
       if (studentExists.isEmpty) {
         throw Exception('Học sinh không tồn tại');
       }
-      
+
       // Check if attendance for this student and date already exists
       final existingAttendance = await db.query(
         'attendance',
@@ -367,7 +388,7 @@ class DatabaseService {
           attendance.date.millisecondsSinceEpoch,
         ],
       );
-      
+
       if (existingAttendance.isNotEmpty) {
         // Update existing attendance instead of inserting
         final existingId = existingAttendance.first['id'] as int;
@@ -380,10 +401,10 @@ class DatabaseService {
         print('Updated existing attendance with ID: $existingId');
         return existingId;
       }
-      
+
       final attendanceMap = attendance.toMap();
       print('Inserting attendance data: $attendanceMap');
-      
+
       final result = await db.insert('attendance', attendanceMap);
       print('Inserted attendance with ID: $result');
       return result;
@@ -490,6 +511,7 @@ class DatabaseService {
       'attendance': attendanceCount.first['count'] as int,
     };
   }
+
   // Test database connection
   Future<bool> testConnection() async {
     try {
@@ -532,23 +554,36 @@ class DatabaseService {
       try {
         final studentsInfo = await db.rawQuery('PRAGMA table_info(students)');
         List<String> requiredColumns = [
-          'id', 'firstName', 'lastName', 'gender', 'dateOfBirth', 
-          'birthPlace', 'currentAddress', 'schoolClass', 'phone',
-          'guardianName', 'guardianPhone', 'email', 'ethnicity', 
-          'note', 'classRoomId', 'createdAt'
+          'id',
+          'firstName',
+          'lastName',
+          'gender',
+          'dateOfBirth',
+          'birthPlace',
+          'currentAddress',
+          'schoolClass',
+          'phone',
+          'guardianName',
+          'guardianPhone',
+          'email',
+          'ethnicity',
+          'note',
+          'classRoomId',
+          'createdAt',
         ];
-        
-        List<String> existingColumns = studentsInfo
-            .map((col) => col['name'] as String)
-            .toList();
-        
+
+        List<String> existingColumns =
+            studentsInfo.map((col) => col['name'] as String).toList();
+
         for (String column in requiredColumns) {
           if (!existingColumns.contains(column)) {
-            result['issues'].add('Column $column is missing from students table');
+            result['issues'].add(
+              'Column $column is missing from students table',
+            );
             result['isHealthy'] = false;
           }
         }
-        
+
         print('Students table columns check completed');
       } catch (e) {
         result['issues'].add('Cannot check students table structure: $e');
@@ -570,14 +605,48 @@ class DatabaseService {
   Future<bool> repairDatabase() async {
     try {
       final db = await database;
-      
+
       // Try to recreate tables if they don't exist
       await _onCreate(db, 2);
-      
+
       print('Database repair attempt completed');
       return true;
     } catch (e) {
       print('Database repair failed: $e');
+      return false;
+    }
+  }
+
+  // Reset database completely
+  Future<bool> resetDatabase() async {
+    try {
+      if (_database != null) {
+        await _database!.close();
+        _database = null;
+      }
+
+      String path;
+      if (kIsWeb) {
+        path = 'tutoring_manager.db';
+      } else {
+        Directory appDir = await getApplicationDocumentsDirectory();
+        final dbDir = Directory(join(appDir.path, 'TutoringManager'));
+        path = join(dbDir.path, 'tutoring_manager.db');
+      }
+
+      // Delete the database file
+      final dbFile = File(path);
+      if (await dbFile.exists()) {
+        await dbFile.delete();
+        print('Database file deleted: $path');
+      }
+
+      // Recreate database with latest schema
+      _database = await _initDatabase();
+      print('Database recreated successfully');
+      return true;
+    } catch (e) {
+      print('Error resetting database: $e');
       return false;
     }
   }
