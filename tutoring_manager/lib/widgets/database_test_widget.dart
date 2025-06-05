@@ -11,6 +11,7 @@ class DatabaseTestWidget extends StatefulWidget {
 class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
   final DatabaseService _dbService = DatabaseService();
   Map<String, int>? _stats;
+  Map<String, dynamic>? _integrityCheck;
   bool _isLoading = true;
   String? _error;
   bool _connectionTest = false;
@@ -31,8 +32,13 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
       // Test database connection
       _connectionTest = await _dbService.testConnection();
       
-      // Get database statistics
-      _stats = await _dbService.getDatabaseStats();
+      // Check database integrity
+      _integrityCheck = await _dbService.checkDatabaseIntegrity();
+      
+      // Get database statistics if connection is successful
+      if (_connectionTest) {
+        _stats = await _dbService.getDatabaseStats();
+      }
       
       setState(() {
         _isLoading = false;
@@ -43,6 +49,34 @@ class _DatabaseTestWidgetState extends State<DatabaseTestWidget> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _repairDatabase() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final success = await _dbService.repairDatabase();
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Database repaired successfully')),
+        );
+        _testDatabase(); // Re-test after repair
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Database repair failed')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Repair error: $e')),
+      );
+    }
+    
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override

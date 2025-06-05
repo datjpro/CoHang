@@ -122,42 +122,40 @@ class DatabaseService {
 
     print('Database initialized successfully with default data');
   }
-
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     print('Upgrading database from version $oldVersion to $newVersion');
 
     if (oldVersion < 2) {
-      // Add missing columns to students table
-      try {
-        await db.execute(
-          'ALTER TABLE students ADD COLUMN gender TEXT NOT NULL DEFAULT "Khác"',
-        );
-        await db.execute(
-          'ALTER TABLE students ADD COLUMN dateOfBirth INTEGER NOT NULL DEFAULT 0',
-        );
-        await db.execute(
-          'ALTER TABLE students ADD COLUMN birthPlace TEXT NOT NULL DEFAULT ""',
-        );
-        await db.execute(
-          'ALTER TABLE students ADD COLUMN currentAddress TEXT NOT NULL DEFAULT ""',
-        );
-        await db.execute(
-          'ALTER TABLE students ADD COLUMN email TEXT NOT NULL DEFAULT ""',
-        );
-        await db.execute(
-          'ALTER TABLE students ADD COLUMN ethnicity TEXT NOT NULL DEFAULT "Kinh"',
-        );
-        await db.execute('ALTER TABLE students ADD COLUMN note TEXT');
+      // Add missing columns to students table one by one
+      List<String> columnsToAdd = [
+        'ALTER TABLE students ADD COLUMN gender TEXT NOT NULL DEFAULT "Khác"',
+        'ALTER TABLE students ADD COLUMN dateOfBirth INTEGER NOT NULL DEFAULT ${DateTime.now().millisecondsSinceEpoch}',
+        'ALTER TABLE students ADD COLUMN birthPlace TEXT NOT NULL DEFAULT ""',
+        'ALTER TABLE students ADD COLUMN currentAddress TEXT NOT NULL DEFAULT ""',
+        'ALTER TABLE students ADD COLUMN email TEXT NOT NULL DEFAULT ""',
+        'ALTER TABLE students ADD COLUMN ethnicity TEXT NOT NULL DEFAULT "Kinh"',
+        'ALTER TABLE students ADD COLUMN note TEXT',
+      ];
 
-        // Update existing records with default values
+      for (String alterQuery in columnsToAdd) {
+        try {
+          await db.execute(alterQuery);
+          print('Successfully executed: $alterQuery');
+        } catch (e) {
+          print('Column might already exist or error: $e');
+          // Continue with next column
+        }
+      }
+
+      // Update existing records with proper default values
+      try {
         await db.execute(
           'UPDATE students SET dateOfBirth = ? WHERE dateOfBirth = 0',
           [DateTime.now().millisecondsSinceEpoch],
         );
-        print('Successfully added new columns to students table');
+        print('Successfully updated default dateOfBirth values');
       } catch (e) {
-        print('Error during database upgrade: $e');
-        // Columns might already exist, continue
+        print('Error updating dateOfBirth defaults: $e');
       }
     }
 
@@ -185,13 +183,45 @@ class DatabaseService {
       return null;
     }
   }
-
   // ClassRoom methods
   Future<int> insertClassRoom(ClassRoom classRoom) async {
-    final db = await database;
-    final result = await db.insert('classrooms', classRoom.toMap());
-    print('Inserted classroom with ID: $result');
-    return result;
+    try {
+      final db = await database;
+      
+      // Validate classroom data
+      if (classRoom.className.isEmpty) {
+        throw Exception('Tên lớp học không được để trống');
+      }
+      
+      if (classRoom.schedule.isEmpty) {
+        throw Exception('Lịch học không được để trống');
+      }
+      
+      if (classRoom.teacherId <= 0) {
+        throw Exception('ID giáo viên không hợp lệ');
+      }
+      
+      // Check if teacher exists
+      final teacherExists = await db.query(
+        'teachers',
+        where: 'id = ?',
+        whereArgs: [classRoom.teacherId],
+      );
+      
+      if (teacherExists.isEmpty) {
+        throw Exception('Giáo viên không tồn tại');
+      }
+      
+      final classRoomMap = classRoom.toMap();
+      print('Inserting classroom data: $classRoomMap');
+      
+      final result = await db.insert('classrooms', classRoomMap);
+      print('Inserted classroom with ID: $result');
+      return result;
+    } catch (e) {
+      print('Error inserting classroom: $e');
+      rethrow;
+    }
   }
 
   Future<List<ClassRoom>> getClassRoomsByTeacher(int teacherId) async {
@@ -235,13 +265,45 @@ class DatabaseService {
     await db.delete('classrooms', where: 'id = ?', whereArgs: [id]);
     print('Deleted classroom with ID: $id');
   }
-
   // Student methods
   Future<int> insertStudent(Student student) async {
-    final db = await database;
-    final result = await db.insert('students', student.toMap());
-    print('Inserted student with ID: $result');
-    return result;
+    try {
+      final db = await database;
+      
+      // Validate student data before insertion
+      if (student.firstName.isEmpty || student.lastName.isEmpty) {
+        throw Exception('Tên và họ học sinh không được để trống');
+      }
+      
+      if (student.guardianName.isEmpty || student.guardianPhone.isEmpty) {
+        throw Exception('Tên và số điện thoại người thân không được để trống');
+      }
+      
+      if (student.classRoomId <= 0) {
+        throw Exception('ID lớp học không hợp lệ');
+      }
+      
+      // Check if classroom exists
+      final classroomExists = await db.query(
+        'classrooms',
+        where: 'id = ?',
+        whereArgs: [student.classRoomId],
+      );
+      
+      if (classroomExists.isEmpty) {
+        throw Exception('Lớp học không tồn tại');
+      }
+      
+      final studentMap = student.toMap();
+      print('Inserting student data: $studentMap');
+      
+      final result = await db.insert('students', studentMap);
+      print('Inserted student with ID: $result');
+      return result;
+    } catch (e) {
+      print('Error inserting student: $e');
+      rethrow;
+    }
   }
 
   Future<List<Student>> getStudentsByClassRoom(int classRoomId) async {
@@ -275,13 +337,60 @@ class DatabaseService {
     await db.delete('students', where: 'id = ?', whereArgs: [id]);
     print('Deleted student with ID: $id');
   }
-
   // Attendance methods
   Future<int> insertAttendance(Attendance attendance) async {
-    final db = await database;
-    final result = await db.insert('attendance', attendance.toMap());
-    print('Inserted attendance with ID: $result');
-    return result;
+    try {
+      final db = await database;
+      
+      // Validate attendance data
+      if (attendance.studentId <= 0) {
+        throw Exception('ID học sinh không hợp lệ');
+      }
+      
+      // Check if student exists
+      final studentExists = await db.query(
+        'students',
+        where: 'id = ?',
+        whereArgs: [attendance.studentId],
+      );
+      
+      if (studentExists.isEmpty) {
+        throw Exception('Học sinh không tồn tại');
+      }
+      
+      // Check if attendance for this student and date already exists
+      final existingAttendance = await db.query(
+        'attendance',
+        where: 'studentId = ? AND date = ?',
+        whereArgs: [
+          attendance.studentId,
+          attendance.date.millisecondsSinceEpoch,
+        ],
+      );
+      
+      if (existingAttendance.isNotEmpty) {
+        // Update existing attendance instead of inserting
+        final existingId = existingAttendance.first['id'] as int;
+        await db.update(
+          'attendance',
+          attendance.toMap(),
+          where: 'id = ?',
+          whereArgs: [existingId],
+        );
+        print('Updated existing attendance with ID: $existingId');
+        return existingId;
+      }
+      
+      final attendanceMap = attendance.toMap();
+      print('Inserting attendance data: $attendanceMap');
+      
+      final result = await db.insert('attendance', attendanceMap);
+      print('Inserted attendance with ID: $result');
+      return result;
+    } catch (e) {
+      print('Error inserting attendance: $e');
+      rethrow;
+    }
   }
 
   Future<List<Attendance>> getAttendanceByStudent(int studentId) async {
@@ -381,7 +490,6 @@ class DatabaseService {
       'attendance': attendanceCount.first['count'] as int,
     };
   }
-
   // Test database connection
   Future<bool> testConnection() async {
     try {
@@ -391,6 +499,85 @@ class DatabaseService {
       return true;
     } catch (e) {
       print('Database connection test failed: $e');
+      return false;
+    }
+  }
+
+  // Check and repair database structure
+  Future<Map<String, dynamic>> checkDatabaseIntegrity() async {
+    try {
+      final db = await database;
+      Map<String, dynamic> result = {
+        'isHealthy': true,
+        'issues': <String>[],
+        'tables': <String, bool>{},
+      };
+
+      // Check if all required tables exist
+      final tables = ['teachers', 'classrooms', 'students', 'attendance'];
+      for (String tableName in tables) {
+        try {
+          await db.rawQuery('SELECT COUNT(*) FROM $tableName');
+          result['tables'][tableName] = true;
+          print('Table $tableName exists and is accessible');
+        } catch (e) {
+          result['tables'][tableName] = false;
+          result['issues'].add('Table $tableName is missing or corrupted');
+          result['isHealthy'] = false;
+          print('Table $tableName issue: $e');
+        }
+      }
+
+      // Check if students table has all required columns
+      try {
+        final studentsInfo = await db.rawQuery('PRAGMA table_info(students)');
+        List<String> requiredColumns = [
+          'id', 'firstName', 'lastName', 'gender', 'dateOfBirth', 
+          'birthPlace', 'currentAddress', 'schoolClass', 'phone',
+          'guardianName', 'guardianPhone', 'email', 'ethnicity', 
+          'note', 'classRoomId', 'createdAt'
+        ];
+        
+        List<String> existingColumns = studentsInfo
+            .map((col) => col['name'] as String)
+            .toList();
+        
+        for (String column in requiredColumns) {
+          if (!existingColumns.contains(column)) {
+            result['issues'].add('Column $column is missing from students table');
+            result['isHealthy'] = false;
+          }
+        }
+        
+        print('Students table columns check completed');
+      } catch (e) {
+        result['issues'].add('Cannot check students table structure: $e');
+        result['isHealthy'] = false;
+      }
+
+      return result;
+    } catch (e) {
+      print('Database integrity check failed: $e');
+      return {
+        'isHealthy': false,
+        'issues': ['Database integrity check failed: $e'],
+        'tables': <String, bool>{},
+      };
+    }
+  }
+
+  // Repair database structure
+  Future<bool> repairDatabase() async {
+    try {
+      final db = await database;
+      
+      // Try to recreate tables if they don't exist
+      await _onCreate(db, 2);
+      
+      print('Database repair attempt completed');
+      return true;
+    } catch (e) {
+      print('Database repair failed: $e');
       return false;
     }
   }
