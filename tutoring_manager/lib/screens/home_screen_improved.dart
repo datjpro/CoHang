@@ -9,14 +9,14 @@ import 'login_screen.dart';
 import '../widgets/classroom_form_dialog.dart';
 import '../widgets/student_form_dialog.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreenImproved extends StatefulWidget {
+  const HomeScreenImproved({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreenImproved> createState() => _HomeScreenImprovedState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenImprovedState extends State<HomeScreenImproved> {
   Map<int, Map<String, bool>> _editing = {};
   Map<int, Map<String, TextEditingController>> _controllers = {};
   final ScrollController _horizontalScrollController = ScrollController();
@@ -320,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quản lý dạy thêm'),
+        title: const Text('Quản lý dạy thêm - Cải tiến'),
         backgroundColor: Colors.blue.shade600,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -668,11 +668,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         child: Column(
                                           children: [
-                                            // Table header with scroll info
+                                            // Enhanced table header with scroll info
                                             Container(
-                                              padding: const EdgeInsets.all(8),
+                                              padding: const EdgeInsets.all(12),
                                               decoration: BoxDecoration(
-                                                color: Colors.blue.shade50,
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.blue.shade50,
+                                                    Colors.blue.shade100,
+                                                  ],
+                                                ),
                                                 borderRadius:
                                                     const BorderRadius.only(
                                                       topLeft: Radius.circular(
@@ -687,32 +692,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 children: [
                                                   Icon(
                                                     Icons.table_view,
-                                                    size: 16,
-                                                    color: Colors.blue.shade600,
+                                                    size: 18,
+                                                    color: Colors.blue.shade700,
                                                   ),
                                                   const SizedBox(width: 8),
                                                   Text(
-                                                    'Danh sách học sinh (${classRoomProvider.students.length})',
+                                                    'Danh sách học sinh (${classRoomProvider.students.length} học sinh)',
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
+                                                      fontSize: 16,
                                                       color:
-                                                          Colors.blue.shade700,
+                                                          Colors.blue.shade800,
                                                     ),
                                                   ),
                                                   const Spacer(),
                                                   Container(
                                                     padding:
                                                         const EdgeInsets.symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 4,
+                                                          horizontal: 12,
+                                                          vertical: 6,
                                                         ),
                                                     decoration: BoxDecoration(
                                                       color:
-                                                          Colors.blue.shade100,
+                                                          Colors.blue.shade200,
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                            12,
+                                                            20,
                                                           ),
                                                     ),
                                                     child: Row(
@@ -721,23 +727,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       children: [
                                                         Icon(
                                                           Icons.swap_horiz,
-                                                          size: 14,
+                                                          size: 16,
                                                           color:
                                                               Colors
                                                                   .blue
-                                                                  .shade600,
+                                                                  .shade700,
                                                         ),
                                                         const SizedBox(
                                                           width: 4,
                                                         ),
                                                         Text(
-                                                          'Kéo ngang để xem thêm',
+                                                          'Kéo để xem thêm thông tin',
                                                           style: TextStyle(
                                                             fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w500,
                                                             color:
                                                                 Colors
                                                                     .blue
-                                                                    .shade600,
+                                                                    .shade700,
                                                           ),
                                                         ),
                                                       ],
@@ -751,6 +759,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 controller:
                                                     _horizontalScrollController,
                                                 thumbVisibility: true,
+                                                thickness: 8,
                                                 child: SingleChildScrollView(
                                                   controller:
                                                       _horizontalScrollController,
@@ -760,6 +769,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     controller:
                                                         _verticalScrollController,
                                                     thumbVisibility: true,
+                                                    thickness: 8,
                                                     child: SingleChildScrollView(
                                                       controller:
                                                           _verticalScrollController,
@@ -789,8 +799,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           ),
                                                           columnSpacing: 12,
                                                           horizontalMargin: 8,
-                                                          dataRowMinHeight: 48,
-                                                          dataRowMaxHeight: 64,
+                                                          dataRowMinHeight: 52,
+                                                          dataRowMaxHeight: 72,
+                                                          headingRowHeight: 56,
                                                           columns: const [
                                                             DataColumn(
                                                               label: SizedBox(
@@ -1014,16 +1025,53 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 final id =
                                                                     student.id!;
                                                                 return DataRow(
+                                                                  color: MaterialStateProperty.resolveWith<
+                                                                    Color?
+                                                                  >((
+                                                                    Set<
+                                                                      MaterialState
+                                                                    >
+                                                                    states,
+                                                                  ) {
+                                                                    if (index %
+                                                                            2 ==
+                                                                        0)
+                                                                      return Colors
+                                                                          .grey
+                                                                          .shade50;
+                                                                    return null;
+                                                                  }),
                                                                   cells: [
                                                                     DataCell(
                                                                       SizedBox(
                                                                         width:
                                                                             40,
-                                                                        child: Text(
-                                                                          '${index + 1}',
-                                                                          style: const TextStyle(
-                                                                            fontSize:
-                                                                                12,
+                                                                        child: Container(
+                                                                          padding: const EdgeInsets.symmetric(
+                                                                            vertical:
+                                                                                4,
+                                                                            horizontal:
+                                                                                8,
+                                                                          ),
+                                                                          decoration: BoxDecoration(
+                                                                            color:
+                                                                                Colors.blue.shade100,
+                                                                            borderRadius: BorderRadius.circular(
+                                                                              12,
+                                                                            ),
+                                                                          ),
+                                                                          child: Text(
+                                                                            '${index + 1}',
+                                                                            style: TextStyle(
+                                                                              fontSize:
+                                                                                  12,
+                                                                              fontWeight:
+                                                                                  FontWeight.bold,
+                                                                              color:
+                                                                                  Colors.blue.shade700,
+                                                                            ),
+                                                                            textAlign:
+                                                                                TextAlign.center,
                                                                           ),
                                                                         ),
                                                                       ),
