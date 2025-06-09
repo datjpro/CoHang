@@ -488,7 +488,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Môn: ${classRoom.subject.displayName}'),
-                                  Text('Lịch: ${classRoom.schedule}'),
+                                  Text(
+                                    'Lịch: ${classRoom.schedule.toString()}',
+                                  ),
                                 ],
                               ),
                               onTap:

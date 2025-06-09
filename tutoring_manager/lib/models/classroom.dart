@@ -1,3 +1,5 @@
+import 'schedule.dart';
+
 enum Subject {
   math('Toán'),
   physics('Lý'),
@@ -14,11 +16,10 @@ class ClassRoom {
   final int? id;
   final String className;
   final Subject subject;
-  final String schedule; // Lịch học (ví dụ: "Thứ 2, 4, 6 - 19:00")
+  final ClassSchedule schedule; // Lịch học với các buổi học cụ thể
   final String groupChatLink;
   final int teacherId;
   final DateTime createdAt;
-
   ClassRoom({
     this.id,
     required this.className,
@@ -28,13 +29,12 @@ class ClassRoom {
     required this.teacherId,
     required this.createdAt,
   });
-
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'className': className,
       'subject': subject.name,
-      'schedule': schedule,
+      'schedule': schedule.toJson(),
       'groupChatLink': groupChatLink,
       'teacherId': teacherId,
       'createdAt': createdAt.millisecondsSinceEpoch,
@@ -46,18 +46,17 @@ class ClassRoom {
       id: map['id'],
       className: map['className'],
       subject: Subject.values.firstWhere((s) => s.name == map['subject']),
-      schedule: map['schedule'],
+      schedule: ClassSchedule.fromJson(map['schedule'] ?? ''),
       groupChatLink: map['groupChatLink'],
       teacherId: map['teacherId'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
     );
   }
-
   ClassRoom copyWith({
     int? id,
     String? className,
     Subject? subject,
-    String? schedule,
+    ClassSchedule? schedule,
     String? groupChatLink,
     int? teacherId,
     DateTime? createdAt,

@@ -3,6 +3,7 @@ import '../services/database_service.dart';
 import '../models/teacher.dart';
 import '../models/classroom.dart';
 import '../models/student.dart';
+import '../models/schedule.dart';
 import '../widgets/database_test_widget.dart';
 
 class DatabaseDebugScreen extends StatefulWidget {
@@ -59,11 +60,21 @@ class _DatabaseDebugScreenState extends State<DatabaseDebugScreen> {
         _addLog('✗ No teachers found. Please insert a teacher first.');
         return;
       }
-
       final classroom = ClassRoom(
         className: 'Lớp Test ${DateTime.now().millisecondsSinceEpoch}',
         subject: Subject.math,
-        schedule: 'Thứ 2, 4, 6 - 19:00',
+        schedule: const ClassSchedule(
+          sessions: [
+            ScheduleSession(
+              dayOfWeek: DayOfWeek.monday,
+              timeSlot: TimeSlot.evening19_21,
+            ),
+            ScheduleSession(
+              dayOfWeek: DayOfWeek.wednesday,
+              timeSlot: TimeSlot.evening19_21,
+            ),
+          ],
+        ),
         groupChatLink: 'https://chat.example.com/test',
         teacherId: teachers.first.id!,
         createdAt: DateTime.now(),

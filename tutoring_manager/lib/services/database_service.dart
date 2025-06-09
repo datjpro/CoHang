@@ -205,14 +205,12 @@ class DatabaseService {
   // ClassRoom methods
   Future<int> insertClassRoom(ClassRoom classRoom) async {
     try {
-      final db = await database;
-
-      // Validate classroom data
+      final db = await database; // Validate classroom data
       if (classRoom.className.isEmpty) {
         throw Exception('Tên lớp học không được để trống');
       }
 
-      if (classRoom.schedule.isEmpty) {
+      if (classRoom.schedule.sessions.isEmpty) {
         throw Exception('Lịch học không được để trống');
       }
 
