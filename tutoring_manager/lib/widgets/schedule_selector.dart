@@ -44,31 +44,6 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
   }
 
   void _updateSession(int index, ScheduleSession newSession) {
-    // Kiểm tra trùng lặp trước khi update
-    bool hasDuplicate = false;
-    for (int i = 0; i < _sessions.length; i++) {
-      if (i != index &&
-          _sessions[i].dayOfWeek == newSession.dayOfWeek &&
-          _sessions[i].timeSlot == newSession.timeSlot) {
-        hasDuplicate = true;
-        break;
-      }
-    }
-
-    if (hasDuplicate) {
-      // Hiển thị thông báo lỗi
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Đã có buổi học vào ${newSession.dayOfWeek.displayName} khung giờ ${newSession.timeSlot.displayName}!',
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
     setState(() {
       _sessions[index] = newSession;
     });
