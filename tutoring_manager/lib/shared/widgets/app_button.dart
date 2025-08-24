@@ -28,17 +28,17 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    
+
     Widget button = switch (variant) {
       ButtonVariant.primary => _buildElevatedButton(context, colorScheme),
       ButtonVariant.secondary => _buildOutlinedButton(context, colorScheme),
       ButtonVariant.ghost => _buildTextButton(context, colorScheme),
       ButtonVariant.danger => _buildElevatedButton(
-          context, 
-          colorScheme,
-          customBackgroundColor: colorScheme.error,
-          customForegroundColor: colorScheme.onError,
-        ),
+        context,
+        colorScheme,
+        customBackgroundColor: colorScheme.error,
+        customForegroundColor: colorScheme.onError,
+      ),
     };
 
     if (fullWidth) {
@@ -57,12 +57,12 @@ class AppButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor ?? customBackgroundColor ?? colorScheme.primary,
-        foregroundColor: foregroundColor ?? customForegroundColor ?? colorScheme.onPrimary,
+        backgroundColor:
+            backgroundColor ?? customBackgroundColor ?? colorScheme.primary,
+        foregroundColor:
+            foregroundColor ?? customForegroundColor ?? colorScheme.onPrimary,
         padding: _getPadding(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 2,
         disabledBackgroundColor: colorScheme.surfaceVariant,
         disabledForegroundColor: colorScheme.onSurfaceVariant,
@@ -77,9 +77,7 @@ class AppButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: foregroundColor ?? colorScheme.primary,
         padding: _getPadding(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         side: BorderSide(
           color: backgroundColor ?? colorScheme.primary,
           width: 1.5,
@@ -96,9 +94,7 @@ class AppButton extends StatelessWidget {
       style: TextButton.styleFrom(
         foregroundColor: foregroundColor ?? colorScheme.primary,
         padding: _getPadding(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         disabledForegroundColor: colorScheme.onSurfaceVariant,
       ),
       child: _buildButtonContent(context),
@@ -144,9 +140,18 @@ class AppButton extends StatelessWidget {
 
   EdgeInsets _getPadding() {
     return switch (size) {
-      ButtonSize.small => const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ButtonSize.medium => const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ButtonSize.large => const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      ButtonSize.small => const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      ButtonSize.medium => const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 12,
+      ),
+      ButtonSize.large => const EdgeInsets.symmetric(
+        horizontal: 32,
+        vertical: 16,
+      ),
     };
   }
 
@@ -159,15 +164,6 @@ class AppButton extends StatelessWidget {
   }
 }
 
-enum ButtonVariant {
-  primary,
-  secondary,
-  ghost,
-  danger,
-}
+enum ButtonVariant { primary, secondary, ghost, danger }
 
-enum ButtonSize {
-  small,
-  medium,
-  large,
-}
+enum ButtonSize { small, medium, large }

@@ -5,7 +5,7 @@ extension ContextExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
   ColorScheme get colorScheme => theme.colorScheme;
   TextTheme get textTheme => theme.textTheme;
-  
+
   // MediaQuery shortcuts
   MediaQueryData get mediaQuery => MediaQuery.of(this);
   Size get screenSize => mediaQuery.size;
@@ -13,23 +13,23 @@ extension ContextExtensions on BuildContext {
   double get screenHeight => screenSize.height;
   EdgeInsets get padding => mediaQuery.padding;
   EdgeInsets get viewInsets => mediaQuery.viewInsets;
-  
+
   // Responsive helpers
   bool get isMobile => screenWidth < 600;
   bool get isTablet => screenWidth >= 600 && screenWidth < 1024;
   bool get isDesktop => screenWidth >= 1024;
-  
+
   // Navigation shortcuts
   NavigatorState get navigator => Navigator.of(this);
   void pop<T>([T? result]) => navigator.pop(result);
-  Future<T?> push<T>(Widget page) => navigator.push<T>(
-    MaterialPageRoute(builder: (_) => page),
-  );
+  Future<T?> push<T>(Widget page) =>
+      navigator.push<T>(MaterialPageRoute(builder: (_) => page));
   Future<T?> pushNamed<T>(String routeName, {Object? arguments}) =>
       navigator.pushNamed<T>(routeName, arguments: arguments);
-  
+
   // SnackBar shortcuts
-  void showSnackBar(String message, {
+  void showSnackBar(
+    String message, {
     Color? backgroundColor,
     IconData? icon,
     Duration duration = const Duration(seconds: 3),
@@ -47,14 +47,12 @@ extension ContextExtensions on BuildContext {
         ),
         backgroundColor: backgroundColor ?? colorScheme.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         duration: duration,
       ),
     );
   }
-  
+
   void showErrorSnackBar(String message) {
     showSnackBar(
       message,
@@ -62,7 +60,7 @@ extension ContextExtensions on BuildContext {
       icon: Icons.error_outline,
     );
   }
-  
+
   void showSuccessSnackBar(String message) {
     showSnackBar(
       message,
@@ -70,7 +68,7 @@ extension ContextExtensions on BuildContext {
       icon: Icons.check_circle_outline,
     );
   }
-  
+
   void showWarningSnackBar(String message) {
     showSnackBar(
       message,
@@ -78,7 +76,7 @@ extension ContextExtensions on BuildContext {
       icon: Icons.warning_amber_outlined,
     );
   }
-  
+
   // Dialog shortcuts
   Future<T?> showConfirmDialog<T>({
     required String title,
@@ -90,34 +88,35 @@ extension ContextExtensions on BuildContext {
   }) {
     return showDialog<T>(
       context: this,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            if (icon != null) ...[
-              Icon(icon, color: confirmColor ?? colorScheme.primary),
-              const SizedBox(width: 8),
-            ],
-            Expanded(child: Text(title)),
-          ],
-        ),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(cancelText),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: confirmColor ?? colorScheme.primary,
+      builder:
+          (context) => AlertDialog(
+            title: Row(
+              children: [
+                if (icon != null) ...[
+                  Icon(icon, color: confirmColor ?? colorScheme.primary),
+                  const SizedBox(width: 8),
+                ],
+                Expanded(child: Text(title)),
+              ],
             ),
-            child: Text(confirmText),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(cancelText),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: confirmColor ?? colorScheme.primary,
+                ),
+                child: Text(confirmText),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
-  
+
   Future<T?> showDeleteConfirmDialog<T>({
     required String title,
     required String content,
@@ -130,31 +129,32 @@ extension ContextExtensions on BuildContext {
       icon: Icons.delete_outline,
     );
   }
-  
+
   // Loading dialog
   void showLoadingDialog({String? message}) {
     showDialog(
       context: this,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(),
-            if (message != null) ...[
-              const SizedBox(height: 16),
-              Text(message),
-            ],
-          ],
-        ),
-      ),
+      builder:
+          (context) => AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                if (message != null) ...[
+                  const SizedBox(height: 16),
+                  Text(message),
+                ],
+              ],
+            ),
+          ),
     );
   }
-  
+
   void hideLoadingDialog() {
     Navigator.of(this).pop();
   }
-  
+
   // Bottom sheet shortcut
   Future<T?> showCustomBottomSheet<T>({
     required Widget child,
@@ -167,12 +167,12 @@ extension ContextExtensions on BuildContext {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) => Container(
-        constraints: maxHeight != null 
-            ? BoxConstraints(maxHeight: maxHeight)
-            : null,
-        child: child,
-      ),
+      builder:
+          (context) => Container(
+            constraints:
+                maxHeight != null ? BoxConstraints(maxHeight: maxHeight) : null,
+            child: child,
+          ),
     );
   }
 }

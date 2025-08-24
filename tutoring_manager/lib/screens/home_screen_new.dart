@@ -40,7 +40,7 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
       title: 'Đăng xuất',
       content: 'Bạn có chắc chắn muốn đăng xuất?',
     );
-    
+
     if (result == true && mounted) {
       Provider.of<AuthProvider>(context, listen: false).logout();
       Navigator.of(context).pushAndRemoveUntil(
@@ -65,15 +65,17 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
   }
 
   void _showAddStudentDialog() {
-    final selectedClassRoom = Provider.of<ClassRoomProvider>(
-      context,
-      listen: false,
-    ).selectedClassRoom;
-    
+    final selectedClassRoom =
+        Provider.of<ClassRoomProvider>(
+          context,
+          listen: false,
+        ).selectedClassRoom;
+
     if (selectedClassRoom != null) {
       showDialog(
         context: context,
-        builder: (context) => StudentFormDialog(classRoomId: selectedClassRoom.id!),
+        builder:
+            (context) => StudentFormDialog(classRoomId: selectedClassRoom.id!),
       );
     }
   }
@@ -81,10 +83,11 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
   void _showEditStudentDialog(Student student) {
     showDialog(
       context: context,
-      builder: (context) => StudentFormDialog(
-        classRoomId: student.classRoomId,
-        student: student,
-      ),
+      builder:
+          (context) => StudentFormDialog(
+            classRoomId: student.classRoomId,
+            student: student,
+          ),
     );
   }
 
@@ -93,11 +96,13 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
       title: 'Xóa lớp học',
       content: 'Bạn có chắc chắn muốn xóa lớp "${classRoom.className}"?',
     );
-    
+
     if (result == true && mounted) {
       try {
-        await Provider.of<ClassRoomProvider>(context, listen: false)
-            .deleteClassRoom(classRoom.id!);
+        await Provider.of<ClassRoomProvider>(
+          context,
+          listen: false,
+        ).deleteClassRoom(classRoom.id!);
         if (mounted) {
           context.showSuccessSnackBar('Xóa lớp học thành công!');
         }
@@ -114,11 +119,13 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
       title: 'Xóa học sinh',
       content: 'Bạn có chắc chắn muốn xóa học sinh "${student.fullName}"?',
     );
-    
+
     if (result == true && mounted) {
       try {
-        await Provider.of<ClassRoomProvider>(context, listen: false)
-            .deleteStudent(student.id!);
+        await Provider.of<ClassRoomProvider>(
+          context,
+          listen: false,
+        ).deleteStudent(student.id!);
         if (mounted) {
           context.showSuccessSnackBar('Xóa học sinh thành công!');
         }
@@ -162,55 +169,62 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                 icon: CircleAvatar(
                   backgroundColor: context.colorScheme.primary,
                   child: Text(
-                    (authProvider.currentTeacher?.fullName ?? 'U')[0].toUpperCase(),
+                    (authProvider.currentTeacher?.fullName ?? 'U')[0]
+                        .toUpperCase(),
                     style: TextStyle(
                       color: context.colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                itemBuilder: (context) => [
-                  PopupMenuItem<void>(
-                    enabled: false,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          authProvider.currentTeacher?.fullName ?? '',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                itemBuilder:
+                    (context) => [
+                      PopupMenuItem<void>(
+                        enabled: false,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              authProvider.currentTeacher?.fullName ?? '',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              authProvider.currentTeacher?.email ?? '',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          authProvider.currentTeacher?.email ?? '',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<void>(
+                        onTap: () => Navigator.pushNamed(context, '/debug'),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.bug_report, size: 18),
+                            SizedBox(width: 8),
+                            Text('Database Debug'),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  PopupMenuItem<void>(
-                    onTap: () => Navigator.pushNamed(context, '/debug'),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.bug_report, size: 18),
-                        SizedBox(width: 8),
-                        Text('Database Debug'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<void>(
-                    onTap: _logout,
-                    child: const Row(
-                      children: [
-                        Icon(Icons.logout, size: 18, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Đăng xuất', style: TextStyle(color: Colors.red)),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                      PopupMenuItem<void>(
+                        onTap: _logout,
+                        child: const Row(
+                          children: [
+                            Icon(Icons.logout, size: 18, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text(
+                              'Đăng xuất',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
               );
             },
           ),
@@ -239,10 +253,7 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
   Widget _buildTabletLayout() {
     return Row(
       children: [
-        SizedBox(
-          width: 350,
-          child: _buildClassRoomsList(),
-        ),
+        SizedBox(width: 350, child: _buildClassRoomsList()),
         const VerticalDivider(width: 1),
         Expanded(child: _buildStudentsList()),
       ],
@@ -252,10 +263,7 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
   Widget _buildDesktopLayout() {
     return Row(
       children: [
-        SizedBox(
-          width: 400,
-          child: _buildClassRoomsList(),
-        ),
+        SizedBox(width: 400, child: _buildClassRoomsList()),
         const VerticalDivider(width: 1),
         Expanded(child: _buildStudentsList()),
       ],
@@ -291,13 +299,10 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                 ],
               ),
             ),
-            
+
             // Loading state
             if (classRoomProvider.isLoading)
-              const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              )
-            
+              const Expanded(child: Center(child: CircularProgressIndicator()))
             // Empty state
             else if (classRoomProvider.classRooms.isEmpty)
               Expanded(
@@ -328,7 +333,6 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                   ),
                 ),
               )
-            
             // Class rooms list
             else
               Expanded(
@@ -337,18 +341,25 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                   itemCount: classRoomProvider.classRooms.length,
                   itemBuilder: (context, index) {
                     final classRoom = classRoomProvider.classRooms[index];
-                    final isSelected = classRoomProvider.selectedClassRoom?.id == classRoom.id;
-                    
+                    final isSelected =
+                        classRoomProvider.selectedClassRoom?.id == classRoom.id;
+
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: AppCard(
-                        onTap: () => classRoomProvider.selectClassRoom(classRoom),
-                        backgroundColor: isSelected 
-                            ? context.colorScheme.primaryContainer
-                            : null,
-                        border: isSelected 
-                            ? Border.all(color: context.colorScheme.primary, width: 2)
-                            : null,
+                        onTap:
+                            () => classRoomProvider.selectClassRoom(classRoom),
+                        backgroundColor:
+                            isSelected
+                                ? context.colorScheme.primaryContainer
+                                : null,
+                        border:
+                            isSelected
+                                ? Border.all(
+                                  color: context.colorScheme.primary,
+                                  width: 2,
+                                )
+                                : null,
                         leading: CircleAvatar(
                           backgroundColor: context.colorScheme.primary,
                           child: Text(
@@ -360,41 +371,54 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                           ),
                         ),
                         title: classRoom.className,
-                        subtitle: '${classRoom.subject.displayName} • ${classRoom.schedule}',
+                        subtitle:
+                            '${classRoom.subject.displayName} • ${classRoom.schedule}',
                         trailing: PopupMenuButton<void>(
-                          itemBuilder: (context) => [
-                            PopupMenuItem<void>(
-                              onTap: () => _showEditClassRoomDialog(classRoom),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.edit, size: 18),
-                                  SizedBox(width: 8),
-                                  Text('Sửa'),
-                                ],
-                              ),
-                            ),
-                            if (classRoom.groupChatLink.isNotEmpty)
-                              PopupMenuItem<void>(
-                                onTap: () => _openGroupChat(classRoom.groupChatLink),
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.chat, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Mở group chat'),
-                                  ],
+                          itemBuilder:
+                              (context) => [
+                                PopupMenuItem<void>(
+                                  onTap:
+                                      () => _showEditClassRoomDialog(classRoom),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.edit, size: 18),
+                                      SizedBox(width: 8),
+                                      Text('Sửa'),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            PopupMenuItem<void>(
-                              onTap: () => _deleteClassRoom(classRoom),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.delete, size: 18, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text('Xóa', style: TextStyle(color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                          ],
+                                if (classRoom.groupChatLink.isNotEmpty)
+                                  PopupMenuItem<void>(
+                                    onTap:
+                                        () => _openGroupChat(
+                                          classRoom.groupChatLink,
+                                        ),
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.chat, size: 18),
+                                        SizedBox(width: 8),
+                                        Text('Mở group chat'),
+                                      ],
+                                    ),
+                                  ),
+                                PopupMenuItem<void>(
+                                  onTap: () => _deleteClassRoom(classRoom),
+                                  child: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.delete,
+                                        size: 18,
+                                        color: Colors.red,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Xóa',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                         ),
                         child: const SizedBox.shrink(),
                       ),
@@ -461,7 +485,10 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                           ),
                         ),
                         Text(
-                          classRoomProvider.selectedClassRoom!.subject.displayName,
+                          classRoomProvider
+                              .selectedClassRoom!
+                              .subject
+                              .displayName,
                           style: context.textTheme.bodyMedium?.copyWith(
                             color: context.colorScheme.onSurfaceVariant,
                           ),
@@ -479,45 +506,50 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                 ],
               ),
             ),
-            
+
             // Students content
             Expanded(
-              child: classRoomProvider.students.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.people_outline,
-                            size: 64,
-                            color: context.colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Chưa có học sinh nào',
-                            style: context.textTheme.titleMedium?.copyWith(
+              child:
+                  classRoomProvider.students.isEmpty
+                      ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              size: 64,
                               color: context.colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Hãy thêm học sinh đầu tiên cho lớp này',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
+                            const SizedBox(height: 16),
+                            Text(
+                              'Chưa có học sinh nào',
+                              style: context.textTheme.titleMedium?.copyWith(
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Text(
+                              'Hãy thêm học sinh đầu tiên cho lớp này',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: context.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      : ResponsiveBuilder(
+                        builder: (context, deviceType) {
+                          if (deviceType == DeviceType.mobile) {
+                            return _buildStudentsCards(
+                              classRoomProvider.students,
+                            );
+                          } else {
+                            return _buildStudentsTable(
+                              classRoomProvider.students,
+                            );
+                          }
+                        },
                       ),
-                    )
-                  : ResponsiveBuilder(
-                      builder: (context, deviceType) {
-                        if (deviceType == DeviceType.mobile) {
-                          return _buildStudentsCards(classRoomProvider.students);
-                        } else {
-                          return _buildStudentsTable(classRoomProvider.students);
-                        }
-                      },
-                    ),
             ),
           ],
         );
@@ -547,28 +579,29 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
             title: student.fullName,
             subtitle: 'Lớp ${student.schoolClass} • ${student.gender}',
             trailing: PopupMenuButton<void>(
-              itemBuilder: (context) => [
-                PopupMenuItem<void>(
-                  onTap: () => _showEditStudentDialog(student),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.edit, size: 18),
-                      SizedBox(width: 8),
-                      Text('Sửa'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<void>(
-                  onTap: () => _deleteStudent(student),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.delete, size: 18, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Xóa', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
+              itemBuilder:
+                  (context) => [
+                    PopupMenuItem<void>(
+                      onTap: () => _showEditStudentDialog(student),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.edit, size: 18),
+                          SizedBox(width: 8),
+                          Text('Sửa'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<void>(
+                      onTap: () => _deleteStudent(student),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.delete, size: 18, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Xóa', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,10 +616,7 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
                         color: context.colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        student.phone!,
-                        style: context.textTheme.bodySmall,
-                      ),
+                      Text(student.phone!, style: context.textTheme.bodySmall),
                     ],
                   ),
                 ],
@@ -621,10 +651,7 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
       padding: const EdgeInsets.all(16),
       child: AppCard.header(
         title: 'Danh sách học sinh (${students.length})',
-        leading: Icon(
-          Icons.table_view,
-          color: context.colorScheme.primary,
-        ),
+        leading: Icon(Icons.table_view, color: context.colorScheme.primary),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
@@ -640,45 +667,52 @@ class _ImprovedHomeScreenState extends State<ImprovedHomeScreen> {
               DataColumn(label: Text('SĐT người thân')),
               DataColumn(label: Text('Thao tác')),
             ],
-            rows: students.asMap().entries.map((entry) {
-              final index = entry.key;
-              final student = entry.value;
-              
-              return DataRow(
-                cells: [
-                  DataCell(Text('${index + 1}')),
-                  DataCell(Text(student.lastName)),
-                  DataCell(Text(student.firstName)),
-                  DataCell(Text(student.gender)),
-                  DataCell(Text(
-                    '${student.dateOfBirth.day.toString().padLeft(2, '0')}/'
-                    '${student.dateOfBirth.month.toString().padLeft(2, '0')}/'
-                    '${student.dateOfBirth.year}'
-                  )),
-                  DataCell(Text(student.schoolClass)),
-                  DataCell(Text(student.phone ?? '')),
-                  DataCell(Text(student.guardianName)),
-                  DataCell(Text(student.guardianPhone)),
-                  DataCell(
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, size: 16),
-                          onPressed: () => _showEditStudentDialog(student),
-                          tooltip: 'Sửa',
+            rows:
+                students.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final student = entry.value;
+
+                  return DataRow(
+                    cells: [
+                      DataCell(Text('${index + 1}')),
+                      DataCell(Text(student.lastName)),
+                      DataCell(Text(student.firstName)),
+                      DataCell(Text(student.gender)),
+                      DataCell(
+                        Text(
+                          '${student.dateOfBirth.day.toString().padLeft(2, '0')}/'
+                          '${student.dateOfBirth.month.toString().padLeft(2, '0')}/'
+                          '${student.dateOfBirth.year}',
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, size: 16, color: Colors.red),
-                          onPressed: () => _deleteStudent(student),
-                          tooltip: 'Xóa',
+                      ),
+                      DataCell(Text(student.schoolClass)),
+                      DataCell(Text(student.phone ?? '')),
+                      DataCell(Text(student.guardianName)),
+                      DataCell(Text(student.guardianPhone)),
+                      DataCell(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, size: 16),
+                              onPressed: () => _showEditStudentDialog(student),
+                              tooltip: 'Sửa',
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                size: 16,
+                                color: Colors.red,
+                              ),
+                              onPressed: () => _deleteStudent(student),
+                              tooltip: 'Xóa',
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
+                      ),
+                    ],
+                  );
+                }).toList(),
           ),
         ),
       ),

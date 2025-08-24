@@ -34,15 +34,12 @@ class ResponsiveLayout extends StatelessWidget {
 class ResponsiveBuilder extends StatelessWidget {
   final Widget Function(BuildContext context, DeviceType deviceType) builder;
 
-  const ResponsiveBuilder({
-    super.key,
-    required this.builder,
-  });
+  const ResponsiveBuilder({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {
     DeviceType deviceType;
-    
+
     if (context.isDesktop) {
       deviceType = DeviceType.desktop;
     } else if (context.isTablet) {
@@ -55,11 +52,7 @@ class ResponsiveBuilder extends StatelessWidget {
   }
 }
 
-enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
-}
+enum DeviceType { mobile, tablet, desktop }
 
 class ResponsiveGrid extends StatelessWidget {
   final List<Widget> children;
@@ -111,11 +104,7 @@ class ResponsiveValue<T> {
   final T? tablet;
   final T? desktop;
 
-  const ResponsiveValue({
-    required this.mobile,
-    this.tablet,
-    this.desktop,
-  });
+  const ResponsiveValue({required this.mobile, this.tablet, this.desktop});
 
   T getValue(DeviceType deviceType) {
     return switch (deviceType) {
@@ -129,10 +118,7 @@ class ResponsiveValue<T> {
 class ResponsiveWidget extends StatelessWidget {
   final ResponsiveValue<Widget> child;
 
-  const ResponsiveWidget({
-    super.key,
-    required this.child,
-  });
+  const ResponsiveWidget({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +133,7 @@ class ResponsiveWidget extends StatelessWidget {
 extension ResponsiveExtensions on BuildContext {
   T responsiveValue<T>(ResponsiveValue<T> value) {
     DeviceType deviceType;
-    
+
     if (isDesktop) {
       deviceType = DeviceType.desktop;
     } else if (isTablet) {

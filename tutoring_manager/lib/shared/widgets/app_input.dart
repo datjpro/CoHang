@@ -69,7 +69,8 @@ class _AppTextFieldState extends State<AppTextField> {
   void initState() {
     super.initState();
     _obscureText = widget.obscureText;
-    _controller = widget.controller ?? TextEditingController(text: widget.initialValue);
+    _controller =
+        widget.controller ?? TextEditingController(text: widget.initialValue);
   }
 
   @override
@@ -95,7 +96,7 @@ class _AppTextFieldState extends State<AppTextField> {
               text: TextSpan(
                 text: widget.label,
                 style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                  color: Colors.black87,
                   fontWeight: FontWeight.w500,
                 ),
                 children: [
@@ -133,19 +134,19 @@ class _AppTextFieldState extends State<AppTextField> {
             style: textTheme.bodyLarge,
             decoration: InputDecoration(
               hintText: widget.hint,
-              prefixIcon: widget.prefixIcon != null
-                  ? Icon(
-                      widget.prefixIcon,
-                      color: _hasFocus 
-                          ? colorScheme.primary 
-                          : colorScheme.onSurfaceVariant,
-                    )
-                  : null,
+              prefixIcon:
+                  widget.prefixIcon != null
+                      ? Icon(
+                        widget.prefixIcon,
+                        color: _hasFocus ? colorScheme.primary : Colors.black54,
+                      )
+                      : null,
               suffixIcon: _buildSuffixIcon(colorScheme),
               filled: true,
-              fillColor: widget.enabled
-                  ? colorScheme.surfaceVariant.withOpacity(0.3)
-                  : colorScheme.surfaceVariant.withOpacity(0.1),
+              fillColor:
+                  widget.enabled
+                      ? colorScheme.surfaceVariant.withOpacity(0.3)
+                      : colorScheme.surfaceVariant.withOpacity(0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -160,23 +161,15 @@ class _AppTextFieldState extends State<AppTextField> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: colorScheme.error,
-                ),
+                borderSide: BorderSide(color: colorScheme.error),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: colorScheme.error,
-                  width: 2,
-                ),
+                borderSide: BorderSide(color: colorScheme.error, width: 2),
               ),
               disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -184,7 +177,8 @@ class _AppTextFieldState extends State<AppTextField> {
                   color: colorScheme.outline.withOpacity(0.2),
                 ),
               ),
-              contentPadding: widget.contentPadding ?? 
+              contentPadding:
+                  widget.contentPadding ??
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               helperText: widget.helperText,
               errorText: widget.errorText,
@@ -201,7 +195,7 @@ class _AppTextFieldState extends State<AppTextField> {
       return IconButton(
         icon: Icon(
           _obscureText ? Icons.visibility : Icons.visibility_off,
-          color: colorScheme.onSurfaceVariant,
+          color: Colors.black54,
         ),
         onPressed: () {
           setState(() {
@@ -253,7 +247,7 @@ class AppDropdownField<T> extends StatelessWidget {
               text: TextSpan(
                 text: label,
                 style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+                  color: Colors.black87,
                   fontWeight: FontWeight.w500,
                 ),
                 children: [
@@ -268,31 +262,34 @@ class AppDropdownField<T> extends StatelessWidget {
           ),
         DropdownButtonFormField<T>(
           value: value,
-          items: items.map((item) {
-            return DropdownMenuItem<T>(
-              value: item.value,
-              child: Row(
-                children: [
-                  if (item.icon != null) ...[
-                    Icon(item.icon, size: 20, color: item.iconColor),
-                    const SizedBox(width: 8),
-                  ],
-                  Expanded(child: Text(item.label)),
-                ],
-              ),
-            );
-          }).toList(),
+          items:
+              items.map((item) {
+                return DropdownMenuItem<T>(
+                  value: item.value,
+                  child: Row(
+                    children: [
+                      if (item.icon != null) ...[
+                        Icon(item.icon, size: 20, color: item.iconColor),
+                        const SizedBox(width: 8),
+                      ],
+                      Expanded(child: Text(item.label)),
+                    ],
+                  ),
+                );
+              }).toList(),
           onChanged: enabled ? onChanged : null,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: colorScheme.onSurfaceVariant)
-                : null,
+            prefixIcon:
+                prefixIcon != null
+                    ? Icon(prefixIcon, color: Colors.black54)
+                    : null,
             filled: true,
-            fillColor: enabled
-                ? colorScheme.surfaceVariant.withOpacity(0.3)
-                : colorScheme.surfaceVariant.withOpacity(0.1),
+            fillColor:
+                enabled
+                    ? colorScheme.surfaceVariant.withOpacity(0.3)
+                    : colorScheme.surfaceVariant.withOpacity(0.1),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -307,16 +304,11 @@ class AppDropdownField<T> extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: colorScheme.error,
-              ),
+              borderSide: BorderSide(color: colorScheme.error),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -324,7 +316,10 @@ class AppDropdownField<T> extends StatelessWidget {
                 color: colorScheme.outline.withOpacity(0.2),
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
         ),
       ],

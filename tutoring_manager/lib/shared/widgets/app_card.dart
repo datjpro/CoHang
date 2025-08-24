@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../extensions/context_extensions.dart';
 
-class AppCard extends StatelessWidget {
+class ModernCard extends StatefulWidget {
   final Widget child;
   final String? title;
   final String? subtitle;
@@ -10,13 +9,15 @@ class AppCard extends StatelessWidget {
   final VoidCallback? onTap;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
-  final double? elevation;
   final Color? backgroundColor;
-  final BorderRadius? borderRadius;
+  final Gradient? gradient;
+  final bool showShadow;
+  final double borderRadius;
   final Border? border;
-  final bool showDivider;
+  final bool isSelected;
+  final Color? selectedColor;
 
-  const AppCard({
+  const ModernCard({
     super.key,
     required this.child,
     this.title,
@@ -26,177 +27,191 @@ class AppCard extends StatelessWidget {
     this.onTap,
     this.padding,
     this.margin,
-    this.elevation,
     this.backgroundColor,
-    this.borderRadius,
+    this.gradient,
+    this.showShadow = true,
+    this.borderRadius = 16,
     this.border,
-    this.showDivider = false,
+    this.isSelected = false,
+    this.selectedColor,
   });
 
-  const AppCard.header({
-    super.key,
-    required this.child,
-    required this.title,
-    this.subtitle,
-    this.leading,
-    this.trailing,
-    this.onTap,
-    this.padding,
-    this.margin,
-    this.elevation,
-    this.backgroundColor,
-    this.borderRadius,
-    this.border,
-  }) : showDivider = true;
+  @override
+  State<ModernCard> createState() => _ModernCardState();
+}
+
+class _ModernCardState extends State<ModernCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = context.colorScheme;
-    
-    Widget cardContent = child;
-    
-    if (title != null || leading != null || trailing != null) {
-      cardContent = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context),
-          if (showDivider) ...[
-            const SizedBox(height: 16),
-            Divider(
-              color: colorScheme.outline.withOpacity(0.2),
-              height: 1,
-            ),
-            const SizedBox(height: 16),
-          ] else if (title != null) ...[
-            const SizedBox(height: 16),
-          ],
-          child,
-        ],
-      );
-    }
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Container(
-      margin: margin ?? const EdgeInsets.all(8),
-      child: Material(
-        elevation: elevation ?? 2,
-        shadowColor: Colors.black.withOpacity(0.1),
-        borderRadius: borderRadius ?? BorderRadius.circular(16),
-        color: backgroundColor ?? colorScheme.surface,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: borderRadius ?? BorderRadius.circular(16),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: borderRadius ?? BorderRadius.circular(16),
-              border: border,
+      margin:
+          widget.margin ??
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: MouseRegion(
+              onEnter: (_) {
+                setState(() => _isHovered = true);
+                if (widget.onTap != null) {
+                  _animationController.forward();
+                }
+              },
+              onExit: (_) {
+                setState(() => _isHovered = false);
+                _animationController.reverse();
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+                decoration: BoxDecoration(
+                  gradient: widget.gradient,
+                  color:
+                      widget.gradient == null
+                          ? (widget.isSelected
+                              ? widget.selectedColor ??
+                                  colorScheme.primaryContainer
+                              : widget.backgroundColor ?? colorScheme.surface)
+                          : null,
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
+                  border:
+                      widget.border ??
+                      (widget.isSelected
+                          ? Border.all(color: colorScheme.primary, width: 2)
+                          : null),
+                  boxShadow:
+                      widget.showShadow
+                          ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(
+                                _isHovered ? 0.15 : 0.08,
+                              ),
+                              blurRadius: _isHovered ? 20 : 10,
+                              offset: Offset(0, _isHovered ? 8 : 4),
+                              spreadRadius: _isHovered ? 2 : 0,
+                            ),
+                          ]
+                          : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: widget.onTap,
+                    borderRadius: BorderRadius.circular(widget.borderRadius),
+                    splashColor: colorScheme.primary.withOpacity(0.1),
+                    highlightColor: colorScheme.primary.withOpacity(0.05),
+                    child: Padding(
+                      padding: widget.padding ?? const EdgeInsets.all(24),
+                      child: _buildContent(context),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            padding: padding ?? const EdgeInsets.all(20),
-            child: cardContent,
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final textTheme = context.textTheme;
-    
-    return Row(
+  Widget _buildContent(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colorScheme = theme.colorScheme;
+
+    if (widget.title == null &&
+        widget.leading == null &&
+        widget.trailing == null) {
+      return widget.child;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (leading != null) ...[
-          leading!,
-          const SizedBox(width: 12),
-        ],
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title != null)
-                Text(
-                  title!,
-                  style: textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: context.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
+        Row(
+          children: [
+            if (widget.leading != null) ...[
+              widget.leading!,
+              const SizedBox(width: 16),
             ],
-          ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.title != null)
+                    Text(
+                      widget.title!,
+                      style: textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  if (widget.subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.subtitle!,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.7),
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (widget.trailing != null) ...[
+              const SizedBox(width: 16),
+              widget.trailing!,
+            ],
+          ],
         ),
-        if (trailing != null) ...[
-          const SizedBox(width: 12),
-          trailing!,
+        if (widget.title != null || widget.subtitle != null) ...[
+          const SizedBox(height: 20),
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colorScheme.outline.withOpacity(0.3),
+                  colorScheme.outline.withOpacity(0.1),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
+        widget.child,
       ],
-    );
-  }
-}
-
-class AppCardGrid extends StatelessWidget {
-  final List<Widget> children;
-  final int crossAxisCount;
-  final double mainAxisSpacing;
-  final double crossAxisSpacing;
-  final double childAspectRatio;
-  final EdgeInsets padding;
-
-  const AppCardGrid({
-    super.key,
-    required this.children,
-    this.crossAxisCount = 2,
-    this.mainAxisSpacing = 16,
-    this.crossAxisSpacing = 16,
-    this.childAspectRatio = 1.0,
-    this.padding = const EdgeInsets.all(16),
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: padding,
-      child: GridView.count(
-        crossAxisCount: crossAxisCount,
-        mainAxisSpacing: mainAxisSpacing,
-        crossAxisSpacing: crossAxisSpacing,
-        childAspectRatio: childAspectRatio,
-        children: children,
-      ),
-    );
-  }
-}
-
-class AppCardList extends StatelessWidget {
-  final List<Widget> children;
-  final EdgeInsets padding;
-  final double spacing;
-  final bool shrinkWrap;
-  final ScrollPhysics? physics;
-
-  const AppCardList({
-    super.key,
-    required this.children,
-    this.padding = const EdgeInsets.all(16),
-    this.spacing = 8,
-    this.shrinkWrap = false,
-    this.physics,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: padding,
-      shrinkWrap: shrinkWrap,
-      physics: physics,
-      itemCount: children.length,
-      separatorBuilder: (context, index) => SizedBox(height: spacing),
-      itemBuilder: (context, index) => children[index],
     );
   }
 }

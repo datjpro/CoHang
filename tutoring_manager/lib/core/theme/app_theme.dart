@@ -11,7 +11,7 @@ class AppTheme {
       colorScheme: AppColors.lightColorScheme,
       textTheme: GoogleFonts.interTextTheme(AppTextStyles.textTheme),
       fontFamily: GoogleFonts.inter().fontFamily,
-      
+
       // AppBar Theme
       appBarTheme: AppBarTheme(
         elevation: 0,
@@ -30,9 +30,7 @@ class AppTheme {
       cardTheme: CardTheme(
         elevation: 2,
         shadowColor: Colors.black.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: AppColors.lightColorScheme.surface,
       ),
 
@@ -71,9 +69,7 @@ class AppTheme {
       // Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           textStyle: AppTextStyles.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
@@ -106,28 +102,25 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.lightColorScheme.error,
-          ),
+          borderSide: BorderSide(color: AppColors.lightColorScheme.error),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         labelStyle: TextStyle(
-          color: AppColors.lightColorScheme.onSurfaceVariant,
+          color: Colors.black87,
           fontSize: 14,
+          fontWeight: FontWeight.w500,
         ),
-        hintStyle: TextStyle(
-          color: AppColors.lightColorScheme.onSurfaceVariant.withOpacity(0.7),
-          fontSize: 14,
-        ),
+        hintStyle: TextStyle(color: Colors.black54, fontSize: 14),
       ),
 
       // Dialog Theme
       dialogTheme: DialogTheme(
         elevation: 8,
         shadowColor: Colors.black.withOpacity(0.2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: AppColors.lightColorScheme.surface,
       ),
 
@@ -144,23 +137,21 @@ class AppTheme {
       // List Tile Theme
       listTileTheme: ListTileThemeData(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
       // Chip Theme
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.lightColorScheme.surfaceVariant,
         deleteIconColor: AppColors.lightColorScheme.onSurfaceVariant,
-        disabledColor: AppColors.lightColorScheme.surfaceVariant.withOpacity(0.5),
+        disabledColor: AppColors.lightColorScheme.surfaceVariant.withOpacity(
+          0.5,
+        ),
         selectedColor: AppColors.lightColorScheme.primary,
         secondarySelectedColor: AppColors.lightColorScheme.secondary,
         labelPadding: const EdgeInsets.symmetric(horizontal: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         labelStyle: AppTextStyles.textTheme.labelMedium,
         secondaryLabelStyle: AppTextStyles.textTheme.labelMedium?.copyWith(
           color: AppColors.lightColorScheme.onSecondary,
@@ -180,10 +171,10 @@ class AppTheme {
         }),
         headingTextStyle: AppTextStyles.textTheme.titleSmall?.copyWith(
           fontWeight: FontWeight.w600,
-          color: AppColors.lightColorScheme.onSurface,
+          color: Colors.black87,
         ),
         dataTextStyle: AppTextStyles.textTheme.bodyMedium?.copyWith(
-          color: AppColors.lightColorScheme.onSurface,
+          color: Colors.black87,
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
@@ -196,9 +187,7 @@ class AppTheme {
       // FAB Theme
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: AppColors.lightColorScheme.primary,
         foregroundColor: AppColors.lightColorScheme.onPrimary,
       ),
@@ -221,16 +210,13 @@ class AppTheme {
           color: AppColors.lightColorScheme.primary,
           size: 24,
         ),
-        unselectedIconTheme: IconThemeData(
-          color: AppColors.lightColorScheme.onSurfaceVariant,
-          size: 24,
-        ),
+        unselectedIconTheme: IconThemeData(color: Colors.black54, size: 24),
         selectedLabelTextStyle: AppTextStyles.textTheme.labelSmall?.copyWith(
           color: AppColors.lightColorScheme.primary,
           fontWeight: FontWeight.w600,
         ),
         unselectedLabelTextStyle: AppTextStyles.textTheme.labelSmall?.copyWith(
-          color: AppColors.lightColorScheme.onSurfaceVariant,
+          color: Colors.black87,
         ),
       ),
 
@@ -249,7 +235,7 @@ class AppTheme {
       colorScheme: AppColors.darkColorScheme,
       textTheme: GoogleFonts.interTextTheme(AppTextStyles.textTheme),
       fontFamily: GoogleFonts.inter().fontFamily,
-      
+
       // Similar structure for dark theme
       appBarTheme: AppBarTheme(
         elevation: 0,
@@ -263,7 +249,7 @@ class AppTheme {
           color: AppColors.darkColorScheme.onSurface,
         ),
       ),
-      
+
       // ... other theme configurations for dark mode
     );
   }

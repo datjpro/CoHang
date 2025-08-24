@@ -7,18 +7,21 @@
 ## 🎨 Cải tiến UX/UI
 
 ### ✨ Thiết kế hiện đại
+
 - **Material Design 3**: Sử dụng theme system hiện đại với color schemes tùy chỉnh
 - **Typography**: Font Inter cho trải nghiệm đọc tốt nhất
 - **Responsive Layout**: Tự động điều chỉnh giao diện cho mobile, tablet, desktop
 - **Dark/Light Theme**: Hỗ trợ chế độ sáng/tối tự động theo hệ thống
 
 ### 🔧 Component Library
+
 - **AppButton**: Button component với nhiều variant (primary, secondary, ghost, danger)
 - **AppCard**: Card component linh hoạt với header, subtitle, actions
 - **AppTextField**: Input field với validation và accessibility tốt
 - **ResponsiveLayout**: Layout tự động điều chỉnh theo kích thước màn hình
 
 ### 📱 Responsive Design
+
 - **Mobile First**: Thiết kế ưu tiên mobile với card-based layout
 - **Tablet**: Split-view layout hiển thị danh sách lớp và học sinh cùng lúc
 - **Desktop**: Maximized screen real estate với table view cho dữ liệu
@@ -61,6 +64,7 @@ lib/
 ## 🚀 Tính năng Cải tiến
 
 ### 💡 UX Improvements
+
 - **Intuitive Navigation**: Back button trên mobile, persistent sidebar trên tablet/desktop
 - **Loading States**: Loading indicators với animation mượt mà
 - **Error Handling**: Error messages user-friendly với action buttons
@@ -68,12 +72,14 @@ lib/
 - **Confirmation Dialogs**: Modern dialog design với clear actions
 
 ### 🎯 Accessibility
+
 - **Keyboard Navigation**: Full keyboard support
 - **Screen Reader**: Semantic labels và descriptions
 - **Focus Management**: Proper focus handling
 - **Color Contrast**: WCAG compliant colors
 
 ### ⚡ Performance
+
 - **Lazy Loading**: Load data on demand
 - **Efficient Rebuilds**: Optimized state management
 - **Memory Management**: Proper disposal of resources
@@ -91,12 +97,13 @@ lib/
 ## 📊 Responsive Breakpoints
 
 - **Mobile**: < 600px
-- **Tablet**: 600px - 1024px  
+- **Tablet**: 600px - 1024px
 - **Desktop**: > 1024px
 
 ## 🎨 Design Tokens
 
 ### Colors
+
 - **Primary**: Blue (#1976D2)
 - **Secondary**: Blue Grey (#535F70)
 - **Error**: Red (#BA1A1A)
@@ -104,6 +111,7 @@ lib/
 - **Warning**: Orange (#FF9800)
 
 ### Typography
+
 - **Display**: 57px/45px/36px
 - **Headline**: 32px/28px/24px
 - **Title**: 22px/16px/14px
@@ -111,6 +119,7 @@ lib/
 - **Label**: 14px/12px/11px
 
 ### Spacing
+
 - **Small**: 8px
 - **Medium**: 16px
 - **Large**: 24px

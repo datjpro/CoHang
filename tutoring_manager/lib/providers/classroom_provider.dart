@@ -89,6 +89,10 @@ class ClassRoomProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void clearSelection() {
+    deselectClassRoom();
+  }
+
   Future<void> loadStudents(int classRoomId) async {
     _isLoading = true;
     notifyListeners();
