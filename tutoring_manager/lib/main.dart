@@ -3,10 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
 import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/home_screen_new.dart';
 import 'screens/database_debug_screen.dart';
 
 void main() {
@@ -31,15 +32,13 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Quản lý dạy thêm',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-          fontFamily: 'Segoe UI',
-        ),
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
         home: Consumer<AuthProvider>(
           builder: (context, authProvider, _) {
             return authProvider.isLoggedIn
-                ? const HomeScreen()
+                ? const ImprovedHomeScreen()
                 : const LoginScreen();
           },
         ),
