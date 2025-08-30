@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/classroom.dart';
 import '../models/student.dart';
 import '../services/database_service.dart';
+import '../services/excel_export_service.dart';
 
 class ClassRoomProvider with ChangeNotifier {
   List<ClassRoom> _classRooms = [];
@@ -148,5 +149,110 @@ class ClassRoomProvider with ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  // Xuất Excel cho lớp hiện tại
+  Future<bool> exportCurrentClassroomToExcel({String? customFileName}) async {
+    if (_selectedClassRoom == null) {
+      _errorMessage = 'Chưa chọn lớp học để xuất';
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      final success = await ExcelExportService.exportClassroomData(
+        classroom: _selectedClassRoom!,
+        students: _students,
+        customFileName: customFileName,
+      );
+
+      if (!success) {
+        _errorMessage = 'Không thể xuất file Excel';
+        notifyListeners();
+      }
+
+      return success;
+    } catch (e) {
+      _errorMessage = 'Lỗi xuất Excel: ${e.toString()}';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Xuất Excel cho tất cả các lớp
+  Future<bool> exportAllClassroomsToExcel({String? customFileName}) async {
+    if (_classRooms.isEmpty) {
+      _errorMessage = 'Không có lớp học nào để xuất';
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      // Tải danh sách học sinh cho tất cả các lớp
+      Map<int, List<Student>> studentsMap = {};
+
+      for (final classroom in _classRooms) {
+        final students = await _databaseService.getStudentsByClassRoom(
+          classroom.id!,
+        );
+        studentsMap[classroom.id!] = students;
+      }
+
+      final success = await ExcelExportService.exportMultipleClassrooms(
+        classrooms: _classRooms,
+        studentsMap: studentsMap,
+        customFileName: customFileName,
+      );
+
+      if (!success) {
+        _errorMessage = 'Không thể xuất file Excel';
+        notifyListeners();
+      }
+
+      return success;
+    } catch (e) {
+      _errorMessage = 'Lỗi xuất Excel: ${e.toString()}';
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Xuất Excel cho một lớp cụ thể
+  Future<bool> exportSpecificClassroomToExcel(
+    ClassRoom classroom, {
+    String? customFileName,
+  }) async {
+    try {
+      print('Xuất Excel cho lớp: ${classroom.className} (ID: ${classroom.id})');
+
+      final students = await _databaseService.getStudentsByClassRoom(
+        classroom.id!,
+      );
+
+      print('Số học sinh tìm thấy: ${students.length}');
+      if (students.isNotEmpty) {
+        print('Học sinh đầu tiên: ${students.first.fullName}');
+      }
+
+      final success = await ExcelExportService.exportClassroomData(
+        classroom: classroom,
+        students: students,
+        customFileName: customFileName,
+      );
+
+      if (!success) {
+        _errorMessage = 'Không thể xuất file Excel';
+        notifyListeners();
+      } else {
+        print('Xuất Excel thành công cho ${students.length} học sinh');
+      }
+
+      return success;
+    } catch (e) {
+      print('Lỗi xuất Excel: $e');
+      _errorMessage = 'Lỗi xuất Excel: ${e.toString()}';
+      notifyListeners();
+      return false;
+    }
   }
 }

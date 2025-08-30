@@ -172,9 +172,87 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
               ],
             ),
           ),
+          // Thêm nút xuất Excel
+          _buildExportButton(context),
+          const SizedBox(width: 16),
           _buildUserMenu(context),
         ],
       ),
+    );
+  }
+
+  Widget _buildExportButton(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Consumer<ClassRoomProvider>(
+      builder: (context, classRoomProvider, _) {
+        return PopupMenuButton<String>(
+          offset: const Offset(0, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colorScheme.primary.withOpacity(0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.file_download, color: colorScheme.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Xuất Excel',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: colorScheme.primary,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+          itemBuilder:
+              (context) => [
+                PopupMenuItem<String>(
+                  value: 'export_current',
+                  enabled: classRoomProvider.selectedClassRoom != null,
+                  child: _buildMenuItem(
+                    Icons.file_download,
+                    'Xuất lớp hiện tại',
+                    isDisabled: classRoomProvider.selectedClassRoom == null,
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'export_all',
+                  enabled: classRoomProvider.classRooms.isNotEmpty,
+                  child: _buildMenuItem(
+                    Icons.download,
+                    'Xuất tất cả lớp',
+                    isDisabled: classRoomProvider.classRooms.isEmpty,
+                  ),
+                ),
+              ],
+          onSelected: (value) {
+            switch (value) {
+              case 'export_current':
+                _exportCurrentClassroom(context);
+                break;
+              case 'export_all':
+                _exportAllClassrooms(context);
+                break;
+            }
+          },
+        );
+      },
     );
   }
 
@@ -247,6 +325,17 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
                   child: _buildMenuItem(Icons.person, 'Thông tin cá nhân'),
                 ),
                 PopupMenuItem<String>(
+                  value: 'export_current',
+                  child: _buildMenuItem(
+                    Icons.file_download,
+                    'Xuất lớp hiện tại',
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'export_all',
+                  child: _buildMenuItem(Icons.download, 'Xuất tất cả lớp'),
+                ),
+                PopupMenuItem<String>(
                   value: 'debug',
                   child: _buildMenuItem(Icons.bug_report, 'Debug Database'),
                 ),
@@ -262,6 +351,12 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
               ],
           onSelected: (value) {
             switch (value) {
+              case 'export_current':
+                _exportCurrentClassroom(context);
+                break;
+              case 'export_all':
+                _exportAllClassrooms(context);
+                break;
               case 'debug':
                 Navigator.pushNamed(context, '/debug');
                 break;
@@ -279,26 +374,162 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
     IconData icon,
     String text, {
     bool isDestructive = false,
+    bool isDisabled = false,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    Color iconColor;
+    Color textColor;
+
+    if (isDisabled) {
+      iconColor = colorScheme.onSurface.withOpacity(0.38);
+      textColor = colorScheme.onSurface.withOpacity(0.38);
+    } else if (isDestructive) {
+      iconColor = colorScheme.error;
+      textColor = colorScheme.error;
+    } else {
+      iconColor = colorScheme.onSurface;
+      textColor = colorScheme.onSurface;
+    }
+
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: isDestructive ? colorScheme.error : colorScheme.onSurface,
-        ),
+        Icon(icon, size: 20, color: iconColor),
         const SizedBox(width: 12),
         Text(
           text,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: isDestructive ? colorScheme.error : colorScheme.onSurface,
-          ),
+          style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
         ),
       ],
     );
+  }
+
+  // Xuất lớp hiện tại ra Excel
+  Future<void> _exportCurrentClassroom(BuildContext context) async {
+    final classRoomProvider = Provider.of<ClassRoomProvider>(
+      context,
+      listen: false,
+    );
+
+    if (classRoomProvider.selectedClassRoom == null) {
+      _showSnackBar(
+        context,
+        'Vui lòng chọn một lớp học để xuất',
+        isError: true,
+      );
+      return;
+    }
+
+    _showLoadingDialog(context, 'Đang xuất file Excel...');
+
+    try {
+      final success = await classRoomProvider.exportCurrentClassroomToExcel();
+
+      Navigator.of(context).pop(); // Đóng loading dialog
+
+      if (success) {
+        _showSnackBar(context, 'Xuất file Excel thành công!');
+      } else {
+        _showSnackBar(context, 'Không thể xuất file Excel', isError: true);
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Đóng loading dialog
+      _showSnackBar(context, 'Lỗi xuất Excel: $e', isError: true);
+    }
+  }
+
+  // Xuất tất cả lớp ra Excel
+  Future<void> _exportAllClassrooms(BuildContext context) async {
+    final classRoomProvider = Provider.of<ClassRoomProvider>(
+      context,
+      listen: false,
+    );
+
+    if (classRoomProvider.classRooms.isEmpty) {
+      _showSnackBar(context, 'Không có lớp học nào để xuất', isError: true);
+      return;
+    }
+
+    _showLoadingDialog(context, 'Đang xuất tất cả lớp học...');
+
+    try {
+      final success = await classRoomProvider.exportAllClassroomsToExcel();
+
+      Navigator.of(context).pop(); // Đóng loading dialog
+
+      if (success) {
+        _showSnackBar(context, 'Xuất tất cả lớp học thành công!');
+      } else {
+        _showSnackBar(context, 'Không thể xuất file Excel', isError: true);
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Đóng loading dialog
+      _showSnackBar(context, 'Lỗi xuất Excel: $e', isError: true);
+    }
+  }
+
+  // Hiển thị dialog loading
+  void _showLoadingDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => AlertDialog(
+            content: Row(
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(width: 20),
+                Expanded(child: Text(message)),
+              ],
+            ),
+          ),
+    );
+  }
+
+  // Hiển thị SnackBar
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  // Xuất một lớp cụ thể ra Excel
+  Future<void> _exportSpecificClassroom(
+    BuildContext context,
+    ClassRoom classroom,
+  ) async {
+    final classRoomProvider = Provider.of<ClassRoomProvider>(
+      context,
+      listen: false,
+    );
+
+    _showLoadingDialog(context, 'Đang xuất lớp ${classroom.className}...');
+
+    try {
+      final success = await classRoomProvider.exportSpecificClassroomToExcel(
+        classroom,
+      );
+
+      Navigator.of(context).pop(); // Đóng loading dialog
+
+      if (success) {
+        _showSnackBar(context, 'Xuất lớp ${classroom.className} thành công!');
+      } else {
+        _showSnackBar(context, 'Không thể xuất file Excel', isError: true);
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Đóng loading dialog
+      _showSnackBar(context, 'Lỗi xuất Excel: $e', isError: true);
+    }
   }
 
   Widget _buildBody(BuildContext context, bool isDesktop, bool isTablet) {
@@ -354,7 +585,35 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
                   ],
                 ),
               ),
-              _buildAddClassButton(context),
+              Consumer<ClassRoomProvider>(
+                builder: (context, classRoomProvider, _) {
+                  return Row(
+                    children: [
+                      // Nút xuất Excel
+                      if (classRoomProvider.classRooms.isNotEmpty)
+                        ElevatedButton.icon(
+                          onPressed: () => _exportAllClassrooms(context),
+                          icon: const Icon(Icons.file_download, size: 18),
+                          label: const Text('Xuất Excel'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.secondary,
+                            foregroundColor: colorScheme.onSecondary,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      if (classRoomProvider.classRooms.isNotEmpty)
+                        const SizedBox(width: 12),
+                      _buildAddClassButton(context),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -482,9 +741,6 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
   }
 
   Widget _buildSubjectIcon(Subject subject) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     IconData iconData;
     Color iconColor;
 
@@ -526,6 +782,9 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
   }
 
   Widget _buildClassRoomActions(BuildContext context, ClassRoom classRoom) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return PopupMenuButton<String>(
       icon: const Icon(Icons.more_vert),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -535,11 +794,32 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
               value: 'edit',
               child: _buildMenuItem(Icons.edit, 'Chỉnh sửa'),
             ),
+            PopupMenuItem<String>(
+              value: 'export',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.file_download,
+                    size: 20,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Xuất Excel',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             if (classRoom.groupChatLink.isNotEmpty)
               PopupMenuItem<String>(
                 value: 'chat',
                 child: _buildMenuItem(Icons.chat, 'Mở Group Chat'),
               ),
+            const PopupMenuDivider(),
             PopupMenuItem<String>(
               value: 'delete',
               child: _buildMenuItem(Icons.delete, 'Xóa', isDestructive: true),
@@ -549,6 +829,9 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
         switch (value) {
           case 'edit':
             _showEditClassRoomDialog(classRoom);
+            break;
+          case 'export':
+            _exportSpecificClassroom(context, classRoom);
             break;
           case 'chat':
             _openGroupChat(classRoom.groupChatLink);
@@ -633,38 +916,61 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceVariant.withOpacity(0.5),
-              shape: BoxShape.circle,
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.more_vert),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      itemBuilder:
+          (context) => [
+            PopupMenuItem<String>(
+              value: 'edit',
+              child: _buildMenuItem(Icons.edit, 'Chỉnh sửa'),
             ),
-            child: Icon(
-              Icons.arrow_back,
-              size: 64,
-              color: colorScheme.onSurfaceVariant,
+            PopupMenuItem<String>(
+              value: 'export',
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.file_download,
+                    size: 20,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Xuất Excel',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Chọn một lớp học',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w600,
+            PopupMenuItem<String>(
+              value: 'chat',
+              child: _buildMenuItem(Icons.chat, 'Mở Group Chat'),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Chọn lớp học để xem danh sách học sinh',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.6),
+            const PopupMenuDivider(),
+            PopupMenuItem<String>(
+              value: 'delete',
+              child: _buildMenuItem(Icons.delete, 'Xóa', isDestructive: true),
             ),
-          ),
-        ],
-      ),
+          ],
+      onSelected: (value) {
+        switch (value) {
+          case 'edit':
+            _showEditClassRoomDialog(classRoom);
+            break;
+          case 'export':
+            _exportSpecificClassroom(context, classRoom);
+            break;
+          case 'chat':
+            _openGroupChat(classRoom.groupChatLink);
+            break;
+          case 'delete':
+            _showDeleteClassDialog(context, classRoom);
+            break;
+        }
+      },
     );
   }
 
@@ -701,6 +1007,22 @@ class _ModernHomeScreenState extends State<ModernHomeScreen>
             ],
           ),
         ),
+        // Nút xuất Excel cho lớp hiện tại
+        if (provider.students.isNotEmpty)
+          ElevatedButton.icon(
+            onPressed: () => _exportCurrentClassroom(context),
+            icon: const Icon(Icons.file_download, size: 18),
+            label: const Text('Xuất Excel'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        if (provider.students.isNotEmpty) const SizedBox(width: 12),
         ElevatedButton.icon(
           onPressed: _showAddStudentDialog,
           icon: const Icon(Icons.person_add, size: 18),

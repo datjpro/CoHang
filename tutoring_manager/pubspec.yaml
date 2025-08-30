@@ -51,6 +51,10 @@ dependencies:
   url_launcher: ^6.3.1
   google_fonts: ^6.2.1
 
+  # Excel export
+  excel: ^4.0.6
+  file_picker: ^8.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

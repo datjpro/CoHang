@@ -76,6 +76,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Xuất lớp cụ thể ra Excel
+  void _exportSpecificClassroom(
+    BuildContext context,
+    ClassRoom classroom,
+  ) async {
+    final classRoomProvider = Provider.of<ClassRoomProvider>(
+      context,
+      listen: false,
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => AlertDialog(
+            content: Row(
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Text('Đang xuất lớp ${classroom.className}...'),
+                ),
+              ],
+            ),
+          ),
+    );
+
+    try {
+      final success = await classRoomProvider.exportSpecificClassroomToExcel(
+        classroom,
+      );
+
+      Navigator.of(context).pop(); // Đóng loading dialog
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? 'Xuất lớp ${classroom.className} thành công!'
+                : 'Không thể xuất file Excel',
+          ),
+          backgroundColor: success ? Colors.green : Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop(); // Đóng loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi xuất Excel: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
   void _showAddClassRoomDialog() {
     showDialog(
       context: context,
@@ -187,6 +244,63 @@ class _HomeScreenState extends State<HomeScreen> {
             const SnackBar(content: Text('Không thể mở link group chat')),
           );
         }
+      }
+    }
+
+    // Xuất lớp cụ thể ra Excel
+    void _exportSpecificClassroom(
+      BuildContext context,
+      ClassRoom classroom,
+    ) async {
+      final classRoomProvider = Provider.of<ClassRoomProvider>(
+        context,
+        listen: false,
+      );
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (context) => AlertDialog(
+              content: Row(
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Text('Đang xuất lớp ${classroom.className}...'),
+                  ),
+                ],
+              ),
+            ),
+      );
+
+      try {
+        final success = await classRoomProvider.exportSpecificClassroomToExcel(
+          classroom,
+        );
+
+        Navigator.of(context).pop(); // Đóng loading dialog
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Xuất lớp ${classroom.className} thành công!'
+                  : 'Không thể xuất file Excel',
+            ),
+            backgroundColor: success ? Colors.green : Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } catch (e) {
+        Navigator.of(context).pop(); // Đóng loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi xuất Excel: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
     }
   }
@@ -510,6 +624,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Icon(Icons.edit, size: 18),
                                             SizedBox(width: 8),
                                             Text('Sửa'),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem<void>(
+                                        onTap:
+                                            () => _exportSpecificClassroom(
+                                              context,
+                                              classRoom,
+                                            ),
+                                        child: const Row(
+                                          children: [
+                                            Icon(
+                                              Icons.file_download,
+                                              size: 18,
+                                              color: Colors.blue,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Xuất Excel',
+                                              style: TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),

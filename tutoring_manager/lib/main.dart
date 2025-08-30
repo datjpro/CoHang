@@ -7,7 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/classroom_provider.dart';
 import 'screens/login_screen.dart';
-import 'screens/modern_home_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/database_debug_screen.dart';
 
 void main() {
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         home: Consumer<AuthProvider>(
           builder: (context, authProvider, _) {
             return authProvider.isLoggedIn
-                ? const ModernHomeScreen()
+                ? const HomeScreen()
                 : const LoginScreen();
           },
         ),
